@@ -24,3 +24,15 @@ site-packages/textblob/download_corpora.py
 python textblob_sentiment.py
 
 ```
+
+
+## Annotation
+
+prodigy command to annotate whole reviews:
+
+```
+export PRODIGY_BASIC_AUTH_USER=.......
+export PRODIGY_BASIC_AUTH_PASS=.......
+prodigy textcat.manual teaching_reviews_whole_review ./teaching_reviews_whole_review.jsonl --label POSITIVE,NEGATIVE,NEUTRAL,MIXED,UNSURE
+```
+
