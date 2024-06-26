@@ -36,3 +36,15 @@ export PRODIGY_BASIC_AUTH_PASS=.......
 prodigy textcat.manual teaching_reviews_whole_review ./teaching_reviews_whole_review.jsonl --label POSITIVE,NEGATIVE,NEUTRAL,MIXED,UNSURE
 ```
 
+[Instructions for sentence annotations](docs/sentence_annotation.md)
+
+Prodigy command to annotate reviews split by sentence:
+
+```
+export PRODIGY_BASIC_AUTH_USER=.......
+export PRODIGY_BASIC_AUTH_PASS=.......
+export PRODIGY_ALLOWED_SESSIONS=...... # names of annotators
+prodigy textcat.manual teaching_reviews_sentences ./data_jsonl/teaching_reviews_sentences.jsonl --label POSITIVE,NEGATIVE,NEUTRAL,MIXED,UNSURE,SUGGESTION
+```
+
+
