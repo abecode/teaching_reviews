@@ -28,13 +28,35 @@ python textblob_sentiment.py
 
 ## Annotation
 
+### whole review
+
 prodigy command to annotate whole reviews:
 
 ```
 export PRODIGY_BASIC_AUTH_USER=.......
 export PRODIGY_BASIC_AUTH_PASS=.......
 prodigy textcat.manual teaching_reviews_whole_review ./teaching_reviews_whole_review.jsonl --label POSITIVE,NEGATIVE,NEUTRAL,MIXED,UNSURE
+PRODIGY_HOST=0.0.0.0 prodigy textcat.manual teaching_reviews_whole_review ./data_jsonl/teaching_reviews_whole_review.jsonl --label POSITIVE,NEGATIVE,NEUTRAL,MIXED,UNSURE
 ```
+
+to export mengyuan's annotations:
+
+```
+prodigy db-out teaching_reviews_whole_review > mengyuan_teaching_reviews_whole_review.jsonl
+# copy from server: ssh -t ec2-user@server 'cat prodigy_teaching_reviews/mengyuan_teaching_reviews_whole_review.jsonl' > teaching_reviews_whole_review_POSITIVE,NEGATIVE,NEUTRAL,MIXED,UNSURE_mengyuan_20240327.jsonl
+```
+
+### sentence level annotations
+
+
+prodigy.json settings
+
+```
+{
+"feed_overlap":true
+}
+```
+
 
 [Instructions for sentence annotations](docs/sentence_annotation.md)
 
