@@ -4,6 +4,9 @@ setup(
     name='teaching_reviews',
     version='0.0.1',
     packages=find_packages(),
+    package_dir={"teaching_reviews":"teaching_reviews"},
+    include_package_data=True,
+    package_data={"teaching_reviews":["*.db"]},
     install_requires=[
         # list your dependencies here
     ],
