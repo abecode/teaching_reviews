@@ -8,8 +8,6 @@ def get_current_annotation_db_connection() -> sqlite3.Connection:
     """ opens the current database file """
     dbfile = "prodigy.sentence-level.20240701.db"
     dbpath =  os.path.join(os.path.dirname(__file__),
-                           os.path.pardir,
-                           "data_prodigy",
                            dbfile)
     return sqlite3.connect(dbpath)
 
