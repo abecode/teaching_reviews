@@ -1,0 +1,38 @@
+Maybe find a textbook that only includes the language that is taught -- sometimes it was confusing when the information did not apply to oracle SQL.
+Maybe work more in livesql from the beginning.
+Just to get more comfortable actually programming.
+
+Thanks for keeping this course fresh and relevant, Abe
+
+apply book chapter skills to the class project on a weekly basis like the quizes quizd us on the book knowleage.
+it would be more helpful to abosrb and retain the learning matrials.
+
+I would have liked to have more hands on coding and building during class rather than reviewing the reading as much as we had.
+
+Awesome course, awesome professor!
+
+Abe is wonderful and I would take a course from him again.
+He understands that we are all busy people, coming in with different backgrounds, and clearly worked hard to make sure we all learned something.
+He was transparent that it was his first time teaching this course, and I could imagine a few changes to improve it.
+I would have preferred that our weekly break out sessions were with a consistent group of people, so that we could have the opportunity to get to know our classmates better.
+Depending on the combination of students, sometimes the break out room conversations were interesting, but I think that small group time would have been better served doing hands-on exercises together instead of discussing the textbook.
+Actually, overall I wish there was much more hands-on work and less textbook review.
+In our careers we need to have the skills more than we need to know the vocabulary.
+If I didn't already know SQL I'm not sure I would have come away from this course being able to execute a medium complexity query, which I think should be a goal outcome.
+I thought the final project was great, and the open-ended description allowed us all to choose our own adventure based on our interests and background knowledge.
+I think we could have started the final project even earlier in the term and ideally had a round of feedback from Abe during the process.
+The decision to have us prerecord the project presentations was truly brilliant.
+Saved lots of presentation anxiety, potential for technical difficulties, and ensured (hopefully) that everyone comes in under 5 min! Abe utilized the virtual learning tools very well, I appreciated the organized Canvas course, the class announcements, and the discussions.
+I thought it worked well to share with OneDrive even if students had a strangely hard time remembering to make the links actually be links!
+Next term, I'd suggest adding a short break or two during classes, letting us get to know our small groups, and reducing the percentage of lectures and increasing the amount of hands on exercises (all of these things would also encourage cameras on, since it would be less passive).
+Thanks for the course, Abe!
+
+Abe is a great professor, clearly very knowledgeable about database management systems and design.
+He is able to explain complex topics in understandable terms and is always available to answer questions or provide feedback on assignments.
+One thing that I would have liked better about the course structure would be if we had started to design our model at the beginning of the semester and slowly add to it as we learned new topics week by week, rather than learning about all of the topics and then applying them in the last month of class.
+I also think that having randomized groups each week was good for meeting the majority of the classmates, however it may have been more beneficial to work with the same people each week and become more familiar with each other's project topics.
+Overall I really enjoyed this course and it provided a solid foundation for me to learn more in the field of database management systems.
+I would recommend Abe as a professor to anyone looking to take this course.
+
+Recommend having more practice SQL exercises for the class.
+

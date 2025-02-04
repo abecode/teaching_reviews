@@ -1,0 +1,34 @@
+I enjoyed a lot of the content, as well as getting experience using R Studio, of which I wish there were perhaps not more assignments but more challenging assignments.
+You come across as very nice and lenient grading, and your teaching style was good at the start of the class, but as the material got more difficult it seemed you faltered more during the lectures going over the slides.
+If you struggle with explaining this content to us, then we will also struggle.
+I feel like my knowledge of the most difficult content is shaky.
+Following along with your thought process as you solve a problem, only to have you get the wrong answer and backpedal, made it hard to develop the correct way to approach a problem, ie requiring knowledge of the answer beforehand.
+I suggest getting more familiar with these slides, or if they are not your own slides, making your own set as a fresh start.
+
+I give this professor a lot of credit for choosing a solid text, responding quickly to questions via a variety of forms of communication, and for soliciting and acting on feedback to improve his class.
+He's approachable, knowledgeable and I believe he cares about the success of his students.
+Unfortunately, like so many classes in the grad software program, this class is characterized by: 1.
+An assignment to read a chapter 2.
+A class session spent going over PowerPoint slides that reiterate what was in the chapter but without bringing focus or clarity to the material 3.
+A smallish assignment that checks the box for "hands on work" 4.
+Two massive tests that comprise 60-80% of the grade (60% in this particular class) I believe this class, like so many others in the grad software program, would benefit from being flipped.
+Lectures should be viewed in video form outside of class while class time should be spent doing hands on work or exercise problems with the professor present to guide and assist.
+This hands on work should highlight the most important material from the book and ideally would reiterate concepts from previous class sessions.
+I believe the "bunch of lectures and two big tests" system that so many professors in this program seem to implement simply isn't conducive to learning.
+People tend to learn best with lots of opportunities for success and failure that present important concepts to them again and again in a variety of situations.
+Having two large tests that comprise so much of a grade simply incentivizes students to cram and forget, instead of pushing them to exercise and internalize.
+I'd also acknowledge that the "bunch of lectures and two big tests" system is certainly easier on professors who may be carrying a large course load.
+Crafting a flipped course, or one with more focused and exercise-based material, is no small task.
+But the frequency of this model in the St. Thomas grad software program is disheartening - especially at $3,400 per class.
+So while I don't fault Prof. Kazamzadeh for being another in a long line of professors who run a class in the "read, lecture, pass two massive tests" style, it's frustrating that I'm writing a review like this once again.
+
+I am struggling in this class.
+I need more examples than what is presented in class.
+Also I need re-enforcement of “why” we might choose a statistical technique and “what” it means.
+We spent lots of time on “how”.
+I’m relying a lot on Khan academy to supplement what I’m missing in class.
+I do tend to learn slower than my peers
+so maybe it’s me.
+Have you ever considered a separate lab?
+There is never enough time for the R portion of the class.
+

@@ -1,0 +1,60 @@
+I like Abe's teaching style.
+There is a lot of emphasis on the slides during lecture, but that helps me because I don't think I'd retain the information by only reading it in a text book.
+He also does a good job pulling other students' professional experiences, which is very interesting to me and helps me see how this type of work is actually applied in current professional settings.
+
+More hands on SQL work would be really fun to add to the course.
+Aside from that I really liked the class and the teaching style of the professor.
+
+The freedom to choose a topic for the final project was excellent - even someone with a lot of database background (as I have) is able to move on to a new and interesting topic.
+
+Abe is great.
+he is really flexible with homework and tests, and is always open to questions.
+i really liked the project, we did it in steps instead of all at once, it made it easier to digest.
+he is also really understanding that when it comes to everyone being working adults, he really wants us to learn the material regardless of whether your homework answer is right or not, so i appreciate that way of grading.
+anyways, i hope to take a class with abe again.
+
+The course was a learning process for all.
+Every class needs to focus in providing students with projects to put on to github instead of exams.
+These are not english class we are trying build skill for.
+We need to be doing what we learn with regularity.
+
+I really liked the class.
+
+I would say that I was a beginning to low intermediate student when it came to databases.
+I have a BS in computer science, but I don’t really interact with databases at a detail level in my career.
+I think this course did a decent job of covering a wide array of database topics; maybe too wide.
+So of the discussion on how to install various tools and applications that we did not actually wind up using seemed like a poor use of time.
+There should have been much more homework, especially hands on work.
+I felt like there was very little practice to learn from our mistakes.
+The semester started out with a lot of hands-on work, jumping directly into doing a large volume of SQL statements.
+I was enthused; it was actually FUN!
+We got immediate feedback with either being rewarded with a result of our query, or an error that we then needed to research and keep trying until it worked.
+Later, as we were working through some very, very long chapters in the book, there was little hands on.
+I feel like there should have been assignments for every class session.
+The book was not exclusively, but highly focused on Microsoft SQL Server and not Oracle.
+I get it that Oracle may be highly prominent in the industry and certainly a good employment skill for students, it was a bit frustrating to have a textbook that leaned towards MS and the work was 100% Oracle.
+The breakout rooms did not seem very valuable to me, mainly because we did not always have a lot to talk about.
+This brings me back to more frequent homework.
+If we had assignments for each class, then the breakouts would have held more value to discuss the problems and outcomes.
+Also, I think if we had more static breakout groups we would have grown together and been able to converse more.
+Understand the value of mixing it up, so a compromise could be what I have had in other classes: 1 static group prior to midterm
+and then we get new teams for 2nd half of semester.
+And to take that one step further, I think that it would have been really interesting if the final project was a team project.
+This would have been more “real world” to create the problem solution as a team since that is how people would do it on the job.
+Many of my other GPS classes have had team midterm and final projects.
+It allows each person to use their strengths and learn from the others, especially with getting feedback.
+“Hands On” segments at the end of class were really an instructor demo.
+There was not the time, prepared instructions, or ability to multitask with watching what was happening in the demo and try to replicate it at the same time.
+Plus they were always at the very end and we often went over the class end time.
+This course, with 3 sections and lot of material, seems like it could be a good candidate for a Flipped Course format, with the lectures pre-recorded and the class sessions reserved for exercises, team work on projects, questions to the professor, etc.
+It would certainly cut down on the need to repeat the lecture 3 nights a week.
+Overall, I think this was a good course with challenging subject material and was a good showing for the professors first time teaching this class.
+
+I really learned a lot taking this class, I wasn't as big a fan of the textbook but I have really had my eyes opened to SQL and how useful it is
+and It has already helped me out and work.
+Thanks Professor!
+
+Professor has good skill sets for this course to explain and provides real example.
+If the professor could cover another SQL software for experimentation that would be helpful ( eg.
+Microsoft SQL server management studio, MySQL, PostgreSQL).
+
