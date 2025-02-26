@@ -2,19 +2,22 @@ While Abe is one of the kindest professors I have had over the course of my unde
 It is apparent he does not look at the slides before class.
 He cannot always solve the practice problems which the answers are provided on his instructor set of slides.
 When attempting to answer student questions, they are rarely resolved and often include the phrase "google that."
-He has admitted his primary coding language is python so he sometimes doesn't code right in R or will spend copious amounts of time talking about how you could code it in python when the class is about R. Abe also did not adequately prepare for the semester because he put up the syllabus and shared it with the bookstore, but on the first night of class realized he put the wrong copy of the book in the syllabus which many of us had already purchased.
+He has admitted his primary coding language is python so he sometimes doesn't code right in R or will spend copious amounts of time talking about how you could code it in python when the class is about R.
+Abe also did not adequately prepare for the semester because he put up the syllabus and shared it with the bookstore, but on the first night of class realized he put the wrong copy of the book in the syllabus which many of us had already purchased.
 Luckily, you can get an e-edition for free if you choose to, but that is slightly unethical in my opinion so I double paid for the book.
 
-I think we spend too much class time on statistics and not enough on R. Make getting a book for R mandatory and assign reading.
-The trick for this class maybe is how to balance statistical concepts with R. Assign both homework from the book and R assignments.
+I think we spend too much class time on statistics and not enough on R.
+Make getting a book for R mandatory and assign reading.
+The trick for this class maybe is how to balance statistical concepts with R.
+Assign both homework from the book and R assignments.
 Some outside readings or examples of how the industry collect data, analyze data, and make statistical observations would be helpful to help us put the knowledge into work.
 Nothing is better than real world examples.
 
 Abe is a great communicator and professor.
-He has very deep knowledge of the subject as well as technical skills with R. He is fair with grading as well as providing an opportunity to recover some ground with extra-points with assignments and quizzes after not doing so well with the exam.
+He has very deep knowledge of the subject as well as technical skills with R.
+He is fair with grading as well as providing an opportunity to recover some ground with extra-points with assignments and quizzes after not doing so well with the exam.
 He is open to getting feedback from his students in order to adjust and make sure students learn from his course.
-The course book we are using is good
-but I feel that with Abe's background and qualifications, he can take that book, customize it, and make the course even better.
+The course book we are using is good but I feel that with Abe's background and qualifications, he can take that book, customize it, and make the course even better.
 I have no doubt that relying on the book's direction/path for the course would definitely suffice for what the course is trying to achieve but if it can be customized to fit the overall program would be even better.
 My only comment about the course (not on Abe particularly) is the use of the R language.
 I'm sure it is a great statistical software but I would have liked to use python with the course for the purpose of consistency, proficiency, and logical progression from requiring students to go through Python as a pre-requisite, taking the foundations in data analysis, machine-learning, up to the artificial intelligence course.

@@ -14,10 +14,10 @@ Very patient and an overall a good prof.
 I think Abe could come more prepared to class to show examples from the book.
 Often it felt like he was walking through them for the first time while showing us.
 He understands the concepts, but at times it got lost while sorting through the problem.
-Also it felt broken between learning the statistical equations in the textbook versus R. I really enjoyed working in R and doing the problems in the textbook, I just wish there was more of a tie, it would help solidify concepts and theories and equations.
+Also it felt broken between learning the statistical equations in the textbook versus R.
+I really enjoyed working in R and doing the problems in the textbook, I just wish there was more of a tie, it would help solidify concepts and theories and equations.
 It would be able to show R's capabilities and also be able to feel comfortable using it in everyday work situations.
-Right now I feel there's so much in R that we've gone over in class
-but I don't know where or how to use it/explain it and then so much more that we never went over that could be relevant.
+Right now I feel there's so much in R that we've gone over in class but I don't know where or how to use it/explain it and then so much more that we never went over that could be relevant.
 
 I really enjoyed the homework format provided and learned a lot through them.
 Would love to have more homework that practically applies the readings in RStudio and have more questions to solve that would be similar to the assigned quizzes.

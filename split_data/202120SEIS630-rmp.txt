@@ -6,14 +6,14 @@ Really awful as far as teaching is concerned.
 Dont even ask him questions.
 He makes up some random answers that are completely wrong.
 
-first time teaching this course
-and it showed.
+first time teaching this course and it showed.
 class had a wide range of knowledge which may have created the environment i was in but man was it a slog to get through.
 quizzes were based off the book.
 focusing on reading a book and not require any hands on work for the most part is not what a database class should be.
 i didn't learn much.
 
-If u ask him about video editing or boat sailing, he will passionately chat with u. U ask him anything from the course and he has no answer.
+If u ask him about video editing or boat sailing, he will passionately chat with u.
+U ask him anything from the course and he has no answer.
 So I asked this guy difference between transactions in RDBMS and NoSQL systems.
 His reply was "every database company is different and you should call their customer support to know the differences".
 LOL :)

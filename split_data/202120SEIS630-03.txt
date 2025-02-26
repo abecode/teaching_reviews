@@ -37,8 +37,7 @@ The breakout rooms did not seem very valuable to me, mainly because we did not a
 This brings me back to more frequent homework.
 If we had assignments for each class, then the breakouts would have held more value to discuss the problems and outcomes.
 Also, I think if we had more static breakout groups we would have grown together and been able to converse more.
-Understand the value of mixing it up, so a compromise could be what I have had in other classes: 1 static group prior to midterm
-and then we get new teams for 2nd half of semester.
+Understand the value of mixing it up, so a compromise could be what I have had in other classes: 1 static group prior to midterm and then we get new teams for 2nd half of semester.
 And to take that one step further, I think that it would have been really interesting if the final project was a team project.
 This would have been more “real world” to create the problem solution as a team since that is how people would do it on the job.
 Many of my other GPS classes have had team midterm and final projects.
@@ -50,11 +49,9 @@ This course, with 3 sections and lot of material, seems like it could be a good 
 It would certainly cut down on the need to repeat the lecture 3 nights a week.
 Overall, I think this was a good course with challenging subject material and was a good showing for the professors first time teaching this class.
 
-I really learned a lot taking this class, I wasn't as big a fan of the textbook but I have really had my eyes opened to SQL and how useful it is
-and It has already helped me out and work.
+I really learned a lot taking this class, I wasn't as big a fan of the textbook but I have really had my eyes opened to SQL and how useful it is and It has already helped me out and work.
 Thanks Professor!
 
 Professor has good skill sets for this course to explain and provides real example.
-If the professor could cover another SQL software for experimentation that would be helpful ( eg.
-Microsoft SQL server management studio, MySQL, PostgreSQL).
+If the professor could cover another SQL software for experimentation that would be helpful ( eg. Microsoft SQL server management studio, MySQL, PostgreSQL).
 

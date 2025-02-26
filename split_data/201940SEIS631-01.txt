@@ -7,11 +7,7 @@ I suggest getting more familiar with these slides, or if they are not your own s
 
 I give this professor a lot of credit for choosing a solid text, responding quickly to questions via a variety of forms of communication, and for soliciting and acting on feedback to improve his class.
 He's approachable, knowledgeable and I believe he cares about the success of his students.
-Unfortunately, like so many classes in the grad software program, this class is characterized by: 1.
-An assignment to read a chapter 2.
-A class session spent going over PowerPoint slides that reiterate what was in the chapter but without bringing focus or clarity to the material 3.
-A smallish assignment that checks the box for "hands on work" 4.
-Two massive tests that comprise 60-80% of the grade (60% in this particular class) I believe this class, like so many others in the grad software program, would benefit from being flipped.
+Unfortunately, like so many classes in the grad software program, this class is characterized by: 1. An assignment to read a chapter 2. A class session spent going over PowerPoint slides that reiterate what was in the chapter but without bringing focus or clarity to the material 3. A smallish assignment that checks the box for "hands on work" 4. Two massive tests that comprise 60-80% of the grade (60% in this particular class) I believe this class, like so many others in the grad software program, would benefit from being flipped.
 Lectures should be viewed in video form outside of class while class time should be spent doing hands on work or exercise problems with the professor present to guide and assist.
 This hands on work should highlight the most important material from the book and ideally would reiterate concepts from previous class sessions.
 I believe the "bunch of lectures and two big tests" system that so many professors in this program seem to implement simply isn't conducive to learning.
@@ -27,8 +23,7 @@ I need more examples than what is presented in class.
 Also I need re-enforcement of “why” we might choose a statistical technique and “what” it means.
 We spent lots of time on “how”.
 I’m relying a lot on Khan academy to supplement what I’m missing in class.
-I do tend to learn slower than my peers
-so maybe it’s me.
+I do tend to learn slower than my peers so maybe it’s me.
 Have you ever considered a separate lab?
 There is never enough time for the R portion of the class.
 
