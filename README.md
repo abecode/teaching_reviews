@@ -70,3 +70,23 @@ prodigy textcat.manual teaching_reviews_sentences ./data_jsonl/teaching_reviews_
 ```
 
 
+### Span Annotations
+
+c.f. [SpaCy docs](https://prodi.gy/docs/span-categorization)
+
+first, try sentence-level span annotations 
+
+```
+prodigy spans.manual tmp_spans blank:en ./data_jsonl/teaching_reviews_sentences.jsonl --label POSITIVE,NEGATIVE,NEUTRAL,UNSURE,SUGGESTION
+```
+
+realize: there can still be mixed sentiment at the span level: comparisons are neither positive nor negative but their own label
+
+Also, it doesn't make sense to label spans at the sentence level.  Sentence splitting has some issues and annotating a whole
+
+```
+prodigy spans.manual tmp2_spans blank:en ./data_jsonl/teaching_reviews_whole_review.jsonl --label POSITIVE,NEGATIVE,SUGGESTION,COMPARISON,UNSURE,REDACT
+# remove neutral
+```
+
+save data to data_prodigy/prodigy.20250325.db
