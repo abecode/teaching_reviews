@@ -1,0 +1,13 @@
+* Using sentiment analysis to evaluate qualitative students’ responses
+- https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9581765/
+- Educ Inf Technol (Dordr). 2023; 28(4): 4629–4647.
+* lit review: A Review of Sentiment Analysis Approaches for Quality Assurance in Teaching and Learning
+- https://assets.researchsquare.com/files/rs-2467791/v1/d06e74eb-002d-4411-acca-fc538d56117a.pdf?c=1673893044
+* Sentiment analysis in higher education: a systematic mapping review
+- https://iopscience.iop.org/article/10.1088/1742-6596/1860/1/012002
+* Sentiment Analysis of user reviews in an Online Learning Environment: Analyzing the Methods and Future Prospects
+- https://www.ej-edu.org/index.php/ejedu/article/view/531
+* Sentiment Analysis of Students’ Feedback with NLP and Deep Learning: A Systematic Mapping Study 
+- lineus university
+* A Review of the Trends and Challenges in Adopting Natural Language Processing Methods for Education Feedback Analysis
+- university of queensland
