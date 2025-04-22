@@ -85,8 +85,14 @@ realize: there can still be mixed sentiment at the span level: comparisons are n
 Also, it doesn't make sense to label spans at the sentence level.  Sentence splitting has some issues and annotating a whole
 
 ```
-prodigy spans.manual tmp2_spans blank:en ./data_jsonl/teaching_reviews_whole_review.jsonl --label POSITIVE,NEGATIVE,SUGGESTION,COMPARISON,UNSURE,REDACT
+prodigy spans.manual pilot1_spans blank:en ./data_jsonl/teaching_reviews_whole_review_withRMP.jsonl --label POSITIVE,NEGATIVE,SUGGESTION,COMPARISON,UNSURE,REDACT
 # remove neutral
 ```
 
 save data to data_prodigy/prodigy.20250325.db
+
+review task
+```
+prodigy review pilot1_review pilot1_spans --view-id spans_manual --label POSITIVE,NEGATIVE,SUGGESTION,COMPARISON,UNSURE,REDACT
+Using 6 label(s): POSITIVE, NEGATIVE, SUGGESTION, COMPARISON, UNSURE, REDACT
+```
