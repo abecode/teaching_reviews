@@ -1,14 +1,18 @@
 """ module docstring"""
 
 
-#from collections import defaultdict, Counter
+from collections import defaultdict #, Counter
 from dataclasses import dataclass, asdict
 import json
-#from pathlib import Path
+from pathlib import Path
 from typing import List, Type
+from IPython.display import display, HTML
 import numpy as np
 import pandas as pd
-
+from sklearn.model_selection import train_test_split
+import spacy
+from spacy import displacy
+from spacy.tokens import DocBin
 
 @dataclass
 class Span:
@@ -64,3 +68,102 @@ def filter_spans_with_gte3_agreement(all_spans: pd.DataFrame) -> pd.DataFrame:
                                  .reset_index()
     gte3 = spans_with_counts[spans_with_counts["count"] >=3 ]
     return gte3
+
+def write_spacy_train_dev_test(df: pd.DataFrame, sanity_check=False) -> None:
+    """ writes spacy train, dev, and test data files """
+    # pylint: disable=too-many-locals
+    # Group by input_hash to collect spans for the same document
+    grouped = defaultdict(list)
+    for row in df.itertuples(index=False):
+        grouped[row.input_hash].append(row)
+
+    # Load a blank or pretrained spaCy pipeline
+    nlp = spacy.blank("en")  # or spacy.load("en_core_web_sm") if you're using a tokenizer
+
+    # Split input_hash keys
+    input_hashes = list(grouped.keys())
+
+    # Use scikit-learn for stratified splitting (or simple random)
+    train_ids, temp_ids = train_test_split(input_hashes, test_size=0.3, random_state=42)
+    dev_ids, test_ids = train_test_split(temp_ids, test_size=0.5, random_state=42)
+
+    splits = {
+      "train": train_ids,
+      "dev": dev_ids,
+      "test": test_ids,
+    }
+
+
+    # Create and write .spacy files
+    nlp = spacy.blank("en")
+
+    for split_name, hash_list in splits.items():
+        doc_bin = DocBin(store_user_data=True)
+
+        for input_hash in hash_list:
+            examples = grouped[input_hash]
+            text = examples[0].text
+            doc = nlp.make_doc(text)
+
+            span_objs = []
+            for ex in examples:
+                span = doc.char_span(ex.start, ex.end, label=ex.label,
+                                     alignment_mode="contract")
+                if span:
+                    span_objs.append(span)
+                else:
+                    print(f"⚠️ Skipping invalid span in {split_name}: "
+                          "{ex.label} {ex.start}-{ex.end}")
+
+            doc.spans["sc"] = span_objs
+            doc_bin.add(doc)
+
+        output_file = f"{split_name}.spacy"
+        doc_bin.to_disk(output_file)
+        print(f"✅ Saved {split_name} data to {output_file}")
+
+    if sanity_check:  #sanity check: dump jsonl for each split
+        for split_name, hash_list in splits.items():
+            output_path = Path(f"{split_name}_debug.jsonl")
+            with output_path.open("w", encoding="utf-8") as out:
+                for h in hash_list:
+                    examples = grouped[h]
+                    text = examples[0].text
+                    spans = [{"start": ex.start, "end": ex.end, "label": ex.label}
+                             for ex in examples]
+                    record = {
+                        "text": text,
+                        "spans": spans,
+                        #"annotator": examples[0].annotator,  # Optional
+                        "input_hash": h
+                    }
+                    out.write(json.dumps(record, ensure_ascii=False) + "\n")
+
+            print(f"✅ Wrote {split_name}_debug.jsonl for inspection")
+
+        # load SpaCy model (for tokenizer)
+        nlp = spacy.blank("en")
+
+        # choose your split
+        jsonl_path = Path("train_debug.jsonl")  # or dev_debug.jsonl / test_debug.jsonl
+
+        # load JSONL and parse into spaCy Docs
+        examples = []
+        with jsonl_path.open(encoding="utf-8") as f:
+            for line in f:
+                record = json.loads(line)
+                doc = nlp.make_doc(record["text"])
+                spans = []
+                for span in record["spans"]:
+                    s = doc.char_span(span["start"], span["end"], label=span["label"],
+                                      alignment_mode="contract")
+                    if s is not None:
+                        spans.append(s)
+                    else:
+                        print(f"⚠️ Skipping invalid span: {span}")
+                doc.spans["sc"] = spans  # This mimics spancat training
+                examples.append(doc)
+
+        # display first N examples
+        for doc in examples[:5]:
+            display(HTML(displacy.render(doc, style="span", options={"spans_key": "sc"})))
