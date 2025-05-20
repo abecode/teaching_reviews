@@ -61,10 +61,10 @@ def filter_spans_with_gte3_agreement(all_spans: pd.DataFrame) -> pd.DataFrame:
     """ extract spans with 3 or more agreeing annotators """
     all_spans["count"] = np.ones(len(all_spans))
     spans_with_counts = all_spans.groupby(["input_hash", "start", "end", "label",
-                                           "filename", "linenum", "span"])\
+                                           "filename", "linenum", "span", "text"])\
                                  .count()\
                                  .sort_values(["filename", "linenum"])\
-                                 .drop(columns=["annotator", "text"])\
+                                 .drop(columns=["annotator"])\
                                  .reset_index()
     gte3 = spans_with_counts[spans_with_counts["count"] >=3 ]
     return gte3
