@@ -96,3 +96,45 @@ review task
 prodigy review pilot1_review pilot1_spans --view-id spans_manual --label POSITIVE,NEGATIVE,SUGGESTION,COMPARISON,UNSURE,REDACT
 Using 6 label(s): POSITIVE, NEGATIVE, SUGGESTION, COMPARISON, UNSURE, REDACT
 ```
+
+save data to data_prodigy/prodigy.20250422.db
+
+#### review task json format
+
+
+```json
+{ "text": "the text of the review",
+  "_input_hash": "unique id of the text",
+  "_task_hash": "unique id of the task (annotator/task/input)",
+  "meta": { "filename": "name of the original file",
+            "linenum": "line of the original file" } # these were added manually, not part of prodigy
+  "tokens": [{
+            "text": "Abe",
+            "start": 0,
+            "end": 3,
+            "id": 0,
+            "ws": true}, ...],	
+  "_view_id": "spans_manual",
+    "spans": [
+        {
+            "start": 0,
+            "end": 163,
+            "token_start": 0,
+            "token_end": 27,
+            "label": "REDACT"
+        }, ...]
+  "answer": "accept",
+    "_timestamp": 1743973485,
+    "_annotator_id": "pilot1_review-Henry%20%20(replace%20%3Cyour%20name%3E%20with%20your%20first%20name",
+    "_session_id": "pilot1_review-Henry%20%20(replace%20%3Cyour%20name%3E%20with%20your%20first%20name",
+    "sessions": [
+        "pilot1_spans-abe"
+    ],
+    "versions": [<copy of the original annotations to be reviewed>]
+```	
+
+tldr: the json is very verbose, but you don't need to go into the
+versions list. You could use that to get the original span
+annotations, but those are available from
+`data_jsonl/teaching_reviews_pilot1_spans_reviews_20250414.json`
+  
