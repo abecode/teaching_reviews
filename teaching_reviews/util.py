@@ -4,10 +4,10 @@
 #from collections import defaultdict, Counter
 from dataclasses import dataclass, asdict
 import json
-import numpy as np
-import pandas as pd
 #from pathlib import Path
 from typing import List, Type
+import numpy as np
+import pandas as pd
 
 
 @dataclass
@@ -49,15 +49,18 @@ def extract_spans(review_list: List[tuple]) -> List[Type[pd.DataFrame]]:
                              eg["text"]))
     return pd.DataFrame([asdict(span) for span in spans])
 
+def file_to_span_df(path: str) -> pd.DataFrame:
+    """ go directly from the json file to a dataframe"""
+    return extract_spans(load_jsonl(path))
+
 def filter_spans_with_gte3_agreement(all_spans: pd.DataFrame) -> pd.DataFrame:
     """ extract spans with 3 or more agreeing annotators """
     all_spans["count"] = np.ones(len(all_spans))
-    spans_with_counts = all_span_df.groupby(["input_hash", "start", "end", "label", "filename", "linenum", "span"])\
-                                   .count()\
-                                   .sort_values(["filename", "linenum"])\
-                                   .drop(columns=["annotator", "text"])\
-                                   .reset_index()
+    spans_with_counts = all_spans.groupby(["input_hash", "start", "end", "label",
+                                           "filename", "linenum", "span"])\
+                                 .count()\
+                                 .sort_values(["filename", "linenum"])\
+                                 .drop(columns=["annotator", "text"])\
+                                 .reset_index()
     gte3 = spans_with_counts[spans_with_counts["count"] >=3 ]
     return gte3
-    
-
