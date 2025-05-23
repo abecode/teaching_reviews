@@ -5,6 +5,7 @@ from collections import defaultdict #, Counter
 from dataclasses import dataclass, asdict
 import json
 from pathlib import Path
+import re
 from typing import List, Type
 from IPython.display import display, HTML
 import numpy as np
@@ -13,6 +14,7 @@ from sklearn.model_selection import train_test_split
 import spacy
 from spacy import displacy
 from spacy.tokens import DocBin
+
 
 @dataclass
 class Span:
@@ -33,11 +35,11 @@ def load_jsonl(path:str) -> List[dict]:
     with open(path, 'r', encoding='utf-8') as f:
         return [json.loads(line) for line in f]
 
-def extract_spans_from_review(span_list: dict) -> List[tuple]:
+def extract_spans_tuple(span_list: dict) -> List[tuple]:
     """Convert spans to (start, end, label) format. just for a single review"""
     return [(s["start"], s["end"], s["label"]) for s in span_list]
 
-def extract_spans(review_list: List[tuple]) -> List[Type[pd.DataFrame]]:
+def extract_spans_from_review(review_list: List[tuple]) -> List[Type[pd.DataFrame]]:
     """take a list of loaded json objects and output a dataframe
     who's rows are derived from Span objects"""
     spans = []
@@ -47,7 +49,7 @@ def extract_spans(review_list: List[tuple]) -> List[Type[pd.DataFrame]]:
             filename = eg['meta']["filename"]
             linenum = eg['meta']["linenum"]
             input_hash = eg["_input_hash"]
-            for start, end, label in extract_spans_from_review(eg["spans"]):
+            for start, end, label in extract_spans_tuple(eg["spans"]):
                 spans.append(Span(start, end, label, input_hash, filename,
                              linenum, reviewer, eg["text"][start:end],
                              eg["text"]))
@@ -55,7 +57,7 @@ def extract_spans(review_list: List[tuple]) -> List[Type[pd.DataFrame]]:
 
 def file_to_span_df(path: str) -> pd.DataFrame:
     """ go directly from the json file to a dataframe"""
-    return extract_spans(load_jsonl(path))
+    return extract_spans_from_review(load_jsonl(path))
 
 def filter_spans_with_gte3_agreement(all_spans: pd.DataFrame) -> pd.DataFrame:
     """ extract spans with 3 or more agreeing annotators """
@@ -167,3 +169,97 @@ def write_spacy_train_dev_test(df: pd.DataFrame, sanity_check=False) -> None:
         # display first N examples
         for doc in examples[:5]:
             display(HTML(displacy.render(doc, style="span", options={"spans_key": "sc"})))
+
+
+
+def bracket_to_spacy(text: str) -> dict:
+    """ This takes a bracketed notation, like
+    "[POSITIVE [REDACT Dr. Nguyen] is one of the best instructors I've had].
+    [POSITIVE [REDACT She] made a difficult subject feel manageable and even fun]."
+    and turns it into spacy's span format
+    ```{"text": "Dr. Nguyen is one of the best instructors I've had. She made a difficult subject feel manageable and even fun",
+      "spans": [
+        {
+          "start": 0,
+          "end": 17,
+          "label": "POSITIVE"
+        },
+        {
+          "start": 0,
+          "end": 62,
+          "label": "POSITIVE"
+        },
+        {
+          "start": 68,
+          "end": 70,
+          "label": "REDACT"
+        },
+        {
+          "start": 71,
+          "end": 97,
+          "label": "NEGATIVE"
+        },
+        {
+          "start": 99,
+          "end": 140,
+          "label": "SUGGESTION"
+        }
+     ]
+    }```"""
+
+
+    spans = []
+    clean_text = []
+    stack = []
+
+    i = 0
+    clean_offset = 0  # offset in the clean text
+
+    while i < len(text):
+        if text[i] == '[':
+            # Try to match a [LABEL ...] start
+            match = re.match(r'\[([A-Z]+) ', text[i:])
+            if match:
+                label = match.group(1)
+                i += len(match.group(0))  # move past the [LABEL and space
+                stack.append({
+                    'label': label,
+                    'start_in_clean': clean_offset,
+                    'start_in_raw': i,
+                    'children': []
+                })
+                continue
+        elif text[i] == ']':
+            if stack:
+                span = stack.pop()
+                span_text = ''.join(span['children'])
+                span_length = len(span_text)
+                span['end_in_clean'] = span['start_in_clean'] + len(span_text)
+                spans.append({
+                    'start': span['start_in_clean'],
+                    'end': span['end_in_clean'],
+                    'label': span['label']
+                })
+                if stack:
+                    stack[-1]['children'].append(span_text)
+                else:
+                    clean_text.append(span_text)
+                    clean_offset += span_length
+            i += 1
+            continue
+
+        # Normal character
+        if stack:
+            stack[-1]['children'].append(text[i])
+        else:
+            clean_text.append(text[i])
+            clean_offset += 1
+        i += 1
+
+    return {
+        'text': ''.join(clean_text),
+        'input_hash': hash(text),
+        'filename': 'annotated_reviews_manual.txt',
+        'annotator': "chatgpt",
+        'spans': spans
+    }
