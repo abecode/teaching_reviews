@@ -188,7 +188,7 @@ def experiment_001_basic_spacy_word_vectors(rerun=False):
                                 capture_output=True, text=True)
         #print(result.stdout)
         # cat config.cfg | grep sizes
-        rresult = subprocess.run(["cat", f"{directory}/config.cfg", "|", "grep", "sizes"],
+        result = subprocess.run(["cat", f"{directory}/config.cfg", "|", "grep", "sizes"],
                                 capture_output=True, text=True)
         #print(result.stdout)
         if "30" not in result.stdout:
