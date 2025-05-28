@@ -215,7 +215,7 @@ def experiment_001_basic_spacy_word_vectors(rerun=False):
 
     # evaluate
     result = evaluate(f"{directory}/output/model-best", f"{directory}/test.spacy", f"{directory}/metrics.json",
-                      displacy_path=directory, use_gpu=0)
+                      use_gpu=0)
     #
     print("eval results")
     print(result)
@@ -422,7 +422,7 @@ def experiment_002_basic_spacy_word_vectors_plus_gpt_data(rerun=False):
 
     # evaluate
     result = evaluate(f"{directory}/output/model-best", f"{directory}/test.spacy", f"{directory}/metrics.json",
-                      displacy_path=directory, use_gpu=0)
+                      use_gpu=0)
 
     #
     print("eval results")
