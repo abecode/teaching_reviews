@@ -1,5 +1,6 @@
 from collections import defaultdict
 from dataclasses import dataclass, asdict
+import inspect
 import json
 import os
 import time
@@ -20,7 +21,7 @@ from . import util as tr
 
 def extract_metrics(fname="metrics.json"):
     # Load the JSON file
-    with open("metrics.json") as f:
+    with open(fname) as f:
         metrics = json.load(f)
 
     # Check the result
@@ -62,7 +63,7 @@ def flatten_metrics(metrics):
     return output
 
 
-def experiment_001_basic_spacy_word_vectors():
+def experiment_001_basic_spacy_word_vectors(rerun=False):
     """This is an experiment with just the basic spacy word vectors and the
     organic data split 70/15/15 using spans that were agreed upon by 3+
     annotators
@@ -71,6 +72,16 @@ def experiment_001_basic_spacy_word_vectors():
     spacy spacy.cli . Subprocess wasn't working (maybe because of tqdm type status
     messages?)
     """
+    # make experiment directory
+    directory = inspect.currentframe().f_code.co_name
+    try:
+        os.makedirs(directory, exist_ok=False)
+    except FileExistsError:
+        print(f"directory {directory} already exists")
+        if rerun:
+            print("rerunning experiment")
+        else:
+            return
 
     prodigy_review_file = \
     "teaching_reviews/data_jsonl/teaching_reviews_pilot1_spans_reviews_20250422.json"
@@ -78,8 +89,11 @@ def experiment_001_basic_spacy_word_vectors():
     # check that the data file exists
     if not os.path.exists(prodigy_review_file):
         raise Exception(f"data file {prodigy_review_file} not found")
+
+    #extract data
     prodigy_df = tr.file_to_span_df(prodigy_review_file)
     prodigy_df = tr.filter_spans_with_gte3_agreement(prodigy_df)
+
     # Group by input_hash to collect spans for the same document
     # this way there will be no spans from the same document crossing
     # train/dev/test partitions
@@ -123,7 +137,7 @@ def experiment_001_basic_spacy_word_vectors():
         "test": DocBin(store_user_data=True),
     }
 
-    #add the
+    #add the data to the empty DocBins
     for split_name, hash_list in split_ids.items():
 
         for input_hash in hash_list:
@@ -149,7 +163,7 @@ def experiment_001_basic_spacy_word_vectors():
 
     # save data to file
     for split_name, doc_bin in split_doc_bins.items():
-        output_file = f"{split_name}.spacy"
+        output_file = Path(directory) / f"{split_name}.spacy"
         doc_bin.to_disk(output_file)
         print(f"✅ Saved {split_name} data to {output_file}")
 
@@ -157,7 +171,7 @@ def experiment_001_basic_spacy_word_vectors():
     # python -m spacy init config config.cfg --pipeline spancat --lang en --force
     try:
         result = subprocess.run(["python", "-m", "spacy", "init", "config",
-                                 "config.cfg", "--pipeline", "spancat",
+                                 f"{directory}/config.cfg", "--pipeline", "spancat",
                                  "--lang", "en", "--force"],
                                 capture_output=True, text=True)
         print(result.stdout)
@@ -169,13 +183,13 @@ def experiment_001_basic_spacy_word_vectors():
     # cat config.cfg | grep sizes
     try:
         result = subprocess.run(["perl", "-pe", "s/sizes = \[1,2,3\]/sizes = \[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30\]/",
-                                 "-i.bak", "config.cfg"],
+                                 "-i.bak", f"{directory}/config.cfg"],
                                 capture_output=True, text=True)
-        print(result.stdout)
+        #print(result.stdout)
         # cat config.cfg | grep sizes
-        result = subprocess.run(["cat", "config.cfg", "|", "grep", "sizes"],
+        rresult = subprocess.run(["cat", f"{directory}/config.cfg", "|", "grep", "sizes"],
                                 capture_output=True, text=True)
-        print(result.stdout)
+        #print(result.stdout)
         if "30" not in result.stdout:
             raise Exception("⚠️ ngram size not set to 30")
     except:
@@ -193,19 +207,19 @@ def experiment_001_basic_spacy_word_vectors():
     # training was hard to get working with subprocess
     # https://github.com/explosion/spaCy/discussions/11673
     start = time.time()
-    train("./config.cfg", use_gpu=0, output_path="output",
-          overrides={"paths.train": "./train.spacy", "paths.dev": "./dev.spacy"})
+    train(f"{directory}/config.cfg", use_gpu=0, output_path=f"{directory}/output",
+          overrides={"paths.train": f"{directory}/train.spacy", "paths.dev": f"{directory}/dev.spacy"})
     end = time.time()
     print(f"Training took {end - start:.2f} seconds.")
 
     # evaluate
-    result = evaluate("output/model-best", "./test.spacy", "metrics.json", use_gpu=0)
-
+    result = evaluate(f"{directory}/output/model-best", f"{directory}/test.spacy", f"{directory}/metrics.json",
+                      displacy_path=directory, use_gpu=0)
     #
     print("eval results")
     print(result)
 
-    return extract_metrics()
+    return extract_metrics(f"{directory}/metrics.json")
 
 def experiment_002_basic_spacy_word_vectors_plus_gpt_data():
     """This is an experiment with  spacy word vectors and the
@@ -216,9 +230,19 @@ def experiment_002_basic_spacy_word_vectors_plus_gpt_data():
     spacy spacy.cli . Subprocess wasn't working (maybe because of tqdm type status
     messages?)
     """
+    # make experiment directory
+    directory = inspect.currentframe().f_code.co_name
+    try:
+        os.makedirs(directory, exist_ok=False)
+    except FileExistsError:
+        print(f"directory {directory} already exists")
+        if rerun:
+            print("rerunning experiment")
+        else:
+            return
 
+    # Load the Prodigy review file
     prodigy_review_file = "teaching_reviews/data_jsonl/teaching_reviews_pilot1_spans_reviews_20250422.json"
-
     # check that the data file exists
     if not os.path.exists(prodigy_review_file):
         raise Exception(f"data file {prodigy_review_file} not found")
@@ -345,7 +369,7 @@ def experiment_002_basic_spacy_word_vectors_plus_gpt_data():
 
     # save data to file
     for split_name, doc_bin in split_doc_bins.items():
-        output_file = f"{split_name}.spacy"
+        output_file = Path(directory) / f"{split_name}.spacy"
         doc_bin.to_disk(output_file)
         print(f"✅ Saved {split_name} data to {output_file}")
 
@@ -354,7 +378,7 @@ def experiment_002_basic_spacy_word_vectors_plus_gpt_data():
     # python -m spacy init config config.cfg --pipeline spancat --lang en --force
     try:
         result = subprocess.run(["python", "-m", "spacy", "init", "config",
-                                 "config.cfg", "--pipeline", "spancat",
+                                 f"{directory}/config.cfg", "--pipeline", "spancat",
                                  "--lang", "en", "--force"],
                                 capture_output=True, text=True)
         print(result.stdout)
@@ -366,13 +390,13 @@ def experiment_002_basic_spacy_word_vectors_plus_gpt_data():
     # cat config.cfg | grep sizes
     try:
         result = subprocess.run(["perl", "-pe", "s/sizes = \[1,2,3\]/sizes = \[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30\]/",
-                                 "-i.bak", "config.cfg"],
+                                 "-i.bak", f"{directory}/config.cfg"],
                                 capture_output=True, text=True)
-        print(result.stdout)
+        #print(result.stdout)
         # cat config.cfg | grep sizes
-        result = subprocess.run(["cat", "config.cfg", "|", "grep", "sizes"],
+        result = subprocess.run(["cat", f"{directory}/config.cfg", "|", "grep", "sizes"],
                                 capture_output=True, text=True)
-        print(result.stdout)
+        #print(result.stdout)
         if "30" not in result.stdout:
             raise Exception("⚠️ ngram size not set to 30")
     except:
@@ -390,15 +414,30 @@ def experiment_002_basic_spacy_word_vectors_plus_gpt_data():
     # training was hard to get working with subprocess
     # https://github.com/explosion/spaCy/discussions/11673
     start = time.time()
-    train("./config.cfg", use_gpu=0, output_path="output",
-          overrides={"paths.train": "./train.spacy", "paths.dev": "./dev.spacy"})
+    train(f"{directory}/config.cfg", use_gpu=0, output_path=f"{directory}/output",
+          overrides={"paths.train": f"{directory}/train.spacy", "paths.dev": f"{directory}/dev.spacy"})
     end = time.time()
     print(f"Training took {end - start:.2f} seconds.")
-    evaluate("output/model-best", "./test.spacy", "metrics.json", use_gpu=0)
 
-    return extract_metrics()
+    # evaluate
+    result = evaluate(f"{directory}/output/model-best", f"{directory}/test.spacy", f"{directory}/metrics.json",
+                      displacy_path=directory, use_gpu=0)
 
+    #
+    print("eval results")
+    print(result)
 
+    return extract_metrics(f"{directory}/metrics.json")
+
+def make_experiment_results_table(experiment_results):
+    """ takes the experiemental results and outputs a pandas table with
+    columns for each metric and rows for each experiment"""
+    output = pd.DataFrame(columns=["experiment", "metric", "precision", "recall", "f1"])
+    for experiment_name in experiment_results:
+        nested_rows = flatten_metrics(experiment_results[experiment_name])
+        for metric, row in nested_rows.items():
+            output.loc[len(output)] = [experiment_name, metric, row["p"], row["r"], row["f"]]
+    return output
 
 def plot_metrics(metrics):
     """ plots Data from your metrics.json after it has been flattened to
