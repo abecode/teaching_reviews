@@ -222,7 +222,7 @@ def experiment_001_basic_spacy_word_vectors(rerun=False):
 
     return extract_metrics(f"{directory}/metrics.json")
 
-def experiment_002_basic_spacy_word_vectors_plus_gpt_data():
+def experiment_002_basic_spacy_word_vectors_plus_gpt_data(rerun=False):
     """This is an experiment with  spacy word vectors and the
     organic data split 70/15/15 using spans that were agreed upon by 3+
     annotators, with additional gpt data added to the test set
