@@ -430,14 +430,1126 @@ def experiment_002_basic_spacy_word_vectors_plus_gpt_data(rerun=False):
 
     return extract_metrics(f"{directory}/metrics.json")
 
+def experiment_003_only_abe(rerun=False):
+    """This is an experiment with just the basic spacy word vectors and the
+    organic data split 70/15/15 using spans that were from a single annotator
+
+
+    Note: this function uses half subprocess to run shell commands and half
+    spacy spacy.cli . Subprocess wasn't working (maybe because of tqdm type status
+    messages?)
+    """
+    # make experiment directory
+    directory = inspect.currentframe().f_code.co_name
+    try:
+        os.makedirs(directory, exist_ok=False)
+    except FileExistsError:
+        print(f"directory {directory} already exists")
+        if rerun:
+            print("rerunning experiment")
+        else:
+            return
+
+
+    prodigy_review_file = "teaching_reviews/data_jsonl/teaching_reviews_pilot1_spans_reviews_20250422.json"
+    # check that the data file exists
+    if not os.path.exists(prodigy_review_file):
+        raise Exception(f"data file {prodigy_review_file} not found")
+
+
+    #extract data
+    prodigy_df = tr.file_to_span_df(prodigy_review_file)
+    prodigy_df = prodigy_df[prodigy_df["annotator"] == "pilot1_review-abe"]
+
+    # Group by input_hash to collect spans for the same document
+    # this way there will be no spans from the same document crossing
+    # train/dev/test partitions
+    grouped = defaultdict(list)
+    for row in prodigy_df.itertuples(index=False):
+        grouped[row.input_hash].append(row)
+
+    # Load a blank or pretrained spaCy pipeline
+    nlp = spacy.blank("en")  # or spacy.load("en_core_web_sm") if you're using a tokenizer
+
+    # Get input_hash keys
+    input_hashes = list(grouped.keys())
+
+    # Use scikit-learn for stratified splitting (or simple random)
+    train_ids, temp_ids = train_test_split(input_hashes, test_size=0.3, random_state=42)
+    dev_ids, test_ids = train_test_split(temp_ids, test_size=0.5, random_state=42)
+
+    split_ids = {
+        "train": train_ids,
+        "dev": dev_ids,
+        "test": test_ids,
+    }
+
+    # Split input_hash keys so that we don't have any of the same documents
+    # across train/dev/test sets
+    input_hashes = list(grouped.keys())
+    # Use scikit-learn for stratified splitting (or simple random)
+    train_ids, temp_ids = train_test_split(input_hashes, test_size=0.3, random_state=42) # 70% training
+    dev_ids, test_ids = train_test_split(temp_ids, test_size=0.5, random_state=42)
+
+    nlp = spacy.blank("en")
+
+    split_doc_bins = {
+        "train": DocBin(store_user_data=True),
+        "dev": DocBin(store_user_data=True),
+        "test": DocBin(store_user_data=True),
+    }
+
+    #add the data to the empty DocBins
+    for split_name, hash_list in split_ids.items():
+
+        for input_hash in hash_list:
+            examples = grouped[input_hash]
+            text = examples[0].text
+            doc = nlp.make_doc(text)
+
+            span_objs = []
+            for ex in examples:
+                span = doc.char_span(ex.start, ex.end, label=ex.label,
+                                    alignment_mode="contract")
+                if span:
+                    span_objs.append(span)
+                else:
+                    print(f"⚠️ Skipping invalid span in {split_name}: "
+                          "{ex.label} {ex.start}-{ex.end}")
+
+            doc.spans["sc"] = span_objs
+            split_doc_bins[split_name].add(doc)
+
+    print("train/dev/test document counts", len(split_doc_bins['train']),
+          len(split_doc_bins['dev']), len(split_doc_bins['test']))
+
+    # save data to file
+    for split_name, doc_bin in split_doc_bins.items():
+        output_file = Path(directory) / f"{split_name}.spacy"
+        doc_bin.to_disk(output_file)
+        print(f"✅ Saved {split_name} data to {output_file}")
+
+    # generate spacy config:
+    # python -m spacy init config config.cfg --pipeline spancat --lang en --force
+    try:
+        result = subprocess.run(["python", "-m", "spacy", "init", "config",
+                                 f"{directory}/config.cfg", "--pipeline", "spancat",
+                                 "--lang", "en", "--force"],
+                                capture_output=True, text=True)
+        print(result.stdout)
+    except:
+        raise Exception("⚠️ spacy init config failed")
+
+    # set space spancat suggester config to have ngram size up to 30
+    # perl -pe  's/sizes = \[1,2,3\]/sizes = \[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30\]/' -i.bak config.cfg
+    # cat config.cfg | grep sizes
+    try:
+        result = subprocess.run(["perl", "-pe", "s/sizes = \[1,2,3\]/sizes = \[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30\]/",
+                                 "-i.bak", f"{directory}/config.cfg"],
+                                capture_output=True, text=True)
+        #print(result.stdout)
+        # cat config.cfg | grep sizes
+        result = subprocess.run(["cat", f"{directory}/config.cfg", "|", "grep", "sizes"],
+                                capture_output=True, text=True)
+        #print(result.stdout)
+        if "30" not in result.stdout:
+            raise Exception("⚠️ ngram size not set to 30")
+    except:
+        raise Exception("⚠️ spacy init config failed")
+
+    # in case of trouble try this
+    # python -m spacy debug data config.cfg  --paths.train ./train.spacy  --paths.dev ./dev.spacy --paths.test ./test.spacy
+    # result = subprocess.run("python -m spacy debug data config.cfg  --paths.train ./train.spacy  --paths.dev ./dev.spacy --paths.test ./test.spacy",
+    #                         shell=True, capture_output=True, text=True)
+    # print("debug config results")
+    # print(result.stdout)
+
+    # train
+    #train_cmd = "python -m spacy train config.cfg --output ./output --paths.train ./train.spacy --paths.dev ./dev.spacy --gpu-id 0"
+    # training was hard to get working with subprocess
+    # https://github.com/explosion/spaCy/discussions/11673
+    start = time.time()
+    train(f"{directory}/config.cfg", use_gpu=0, output_path=f"{directory}/output",
+          overrides={"paths.train": f"{directory}/train.spacy", "paths.dev": f"{directory}/dev.spacy"})
+    end = time.time()
+    print(f"Training took {end - start:.2f} seconds.")
+
+    # evaluate
+    result = evaluate(
+        f"{directory}/output/model-best",
+        f"{directory}/test.spacy",
+        f"{directory}/metrics.json",
+        use_gpu=0,
+        spans_key="sc"  # Include this if needed
+    )
+    print("eval results")
+    print(result) # uncomment to see the
+
+    return extract_metrics(f"{directory}/metrics.json")
+
+def experiment_004_only_jenny(rerun=False):
+    """This is an experiment with just the basic spacy word vectors and the
+    organic data split 70/15/15 using spans that were from a single annotator
+
+
+    Note: this function uses half subprocess to run shell commands and half
+    spacy spacy.cli . Subprocess wasn't working (maybe because of tqdm type status
+    messages?)
+    """
+    # make experiment directory
+    directory = inspect.currentframe().f_code.co_name
+    try:
+        os.makedirs(directory, exist_ok=False)
+    except FileExistsError:
+        print(f"directory {directory} already exists")
+        if rerun:
+            print("rerunning experiment")
+        else:
+            return
+
+
+    prodigy_review_file = "teaching_reviews/data_jsonl/teaching_reviews_pilot1_spans_reviews_20250422.json"
+    # check that the data file exists
+    if not os.path.exists(prodigy_review_file):
+        raise Exception(f"data file {prodigy_review_file} not found")
+
+
+    #extract data
+    prodigy_df = tr.file_to_span_df(prodigy_review_file)
+    prodigy_df = prodigy_df[prodigy_df["annotator"] == "pilot1_review-Jenny"]
+
+    # Group by input_hash to collect spans for the same document
+    # this way there will be no spans from the same document crossing
+    # train/dev/test partitions
+    grouped = defaultdict(list)
+    for row in prodigy_df.itertuples(index=False):
+        grouped[row.input_hash].append(row)
+
+    # Load a blank or pretrained spaCy pipeline
+    nlp = spacy.blank("en")  # or spacy.load("en_core_web_sm") if you're using a tokenizer
+
+    # Get input_hash keys
+    input_hashes = list(grouped.keys())
+
+    # Use scikit-learn for stratified splitting (or simple random)
+    train_ids, temp_ids = train_test_split(input_hashes, test_size=0.3, random_state=42)
+    dev_ids, test_ids = train_test_split(temp_ids, test_size=0.5, random_state=42)
+
+    split_ids = {
+        "train": train_ids,
+        "dev": dev_ids,
+        "test": test_ids,
+    }
+
+    # Split input_hash keys so that we don't have any of the same documents
+    # across train/dev/test sets
+    input_hashes = list(grouped.keys())
+    # Use scikit-learn for stratified splitting (or simple random)
+    train_ids, temp_ids = train_test_split(input_hashes, test_size=0.3, random_state=42) # 70% training
+    dev_ids, test_ids = train_test_split(temp_ids, test_size=0.5, random_state=42)
+
+    nlp = spacy.blank("en")
+
+    split_doc_bins = {
+        "train": DocBin(store_user_data=True),
+        "dev": DocBin(store_user_data=True),
+        "test": DocBin(store_user_data=True),
+    }
+
+    #add the data to the empty DocBins
+    for split_name, hash_list in split_ids.items():
+
+        for input_hash in hash_list:
+            examples = grouped[input_hash]
+            text = examples[0].text
+            doc = nlp.make_doc(text)
+
+            span_objs = []
+            for ex in examples:
+                span = doc.char_span(ex.start, ex.end, label=ex.label,
+                                    alignment_mode="contract")
+                if span:
+                    span_objs.append(span)
+                else:
+                    print(f"⚠️ Skipping invalid span in {split_name}: "
+                          "{ex.label} {ex.start}-{ex.end}")
+
+            doc.spans["sc"] = span_objs
+            split_doc_bins[split_name].add(doc)
+
+    print("train/dev/test document counts", len(split_doc_bins['train']),
+          len(split_doc_bins['dev']), len(split_doc_bins['test']))
+
+    # save data to file
+    for split_name, doc_bin in split_doc_bins.items():
+        output_file = Path(directory) / f"{split_name}.spacy"
+        doc_bin.to_disk(output_file)
+        print(f"✅ Saved {split_name} data to {output_file}")
+
+    # generate spacy config:
+    # python -m spacy init config config.cfg --pipeline spancat --lang en --force
+    try:
+        result = subprocess.run(["python", "-m", "spacy", "init", "config",
+                                 f"{directory}/config.cfg", "--pipeline", "spancat",
+                                 "--lang", "en", "--force"],
+                                capture_output=True, text=True)
+        print(result.stdout)
+    except:
+        raise Exception("⚠️ spacy init config failed")
+
+    # set space spancat suggester config to have ngram size up to 30
+    # perl -pe  's/sizes = \[1,2,3\]/sizes = \[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30\]/' -i.bak config.cfg
+    # cat config.cfg | grep sizes
+    try:
+        result = subprocess.run(["perl", "-pe", "s/sizes = \[1,2,3\]/sizes = \[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30\]/",
+                                 "-i.bak", f"{directory}/config.cfg"],
+                                capture_output=True, text=True)
+        #print(result.stdout)
+        # cat config.cfg | grep sizes
+        result = subprocess.run(["cat", f"{directory}/config.cfg", "|", "grep", "sizes"],
+                                capture_output=True, text=True)
+        #print(result.stdout)
+        if "30" not in result.stdout:
+            raise Exception("⚠️ ngram size not set to 30")
+    except:
+        raise Exception("⚠️ spacy init config failed")
+
+    # in case of trouble try this
+    # python -m spacy debug data config.cfg  --paths.train ./train.spacy  --paths.dev ./dev.spacy --paths.test ./test.spacy
+    # result = subprocess.run("python -m spacy debug data config.cfg  --paths.train ./train.spacy  --paths.dev ./dev.spacy --paths.test ./test.spacy",
+    #                         shell=True, capture_output=True, text=True)
+    # print("debug config results")
+    # print(result.stdout)
+
+    # train
+    #train_cmd = "python -m spacy train config.cfg --output ./output --paths.train ./train.spacy --paths.dev ./dev.spacy --gpu-id 0"
+    # training was hard to get working with subprocess
+    # https://github.com/explosion/spaCy/discussions/11673
+    start = time.time()
+    train(f"{directory}/config.cfg", use_gpu=0, output_path=f"{directory}/output",
+          overrides={"paths.train": f"{directory}/train.spacy", "paths.dev": f"{directory}/dev.spacy"})
+    end = time.time()
+    print(f"Training took {end - start:.2f} seconds.")
+
+    # evaluate
+    result = evaluate(
+        f"{directory}/output/model-best",
+        f"{directory}/test.spacy",
+        f"{directory}/metrics.json",
+        use_gpu=0,
+        spans_key="sc"  # Include this if needed
+    )
+    print("eval results")
+    print(result) # uncomment to see the
+
+    return extract_metrics(f"{directory}/metrics.json")
+
+def experiment_005_only_mengyuan(rerun=False):
+    """This is an experiment with just the basic spacy word vectors and the
+    organic data split 70/15/15 using spans that were from a single annotator
+
+
+    Note: this function uses half subprocess to run shell commands and half
+    spacy spacy.cli . Subprocess wasn't working (maybe because of tqdm type status
+    messages?)
+    """
+    # make experiment directory
+    directory = inspect.currentframe().f_code.co_name
+    try:
+        os.makedirs(directory, exist_ok=False)
+    except FileExistsError:
+        print(f"directory {directory} already exists")
+        if rerun:
+            print("rerunning experiment")
+        else:
+            return
+
+
+    prodigy_review_file = "teaching_reviews/data_jsonl/teaching_reviews_pilot1_spans_reviews_20250422.json"
+    # check that the data file exists
+    if not os.path.exists(prodigy_review_file):
+        raise Exception(f"data file {prodigy_review_file} not found")
+
+
+    #extract data
+    prodigy_df = tr.file_to_span_df(prodigy_review_file)
+    prodigy_df = prodigy_df[prodigy_df["annotator"] == "pilot1_review-mengyuan"]
+
+    # Group by input_hash to collect spans for the same document
+    # this way there will be no spans from the same document crossing
+    # train/dev/test partitions
+    grouped = defaultdict(list)
+    for row in prodigy_df.itertuples(index=False):
+        grouped[row.input_hash].append(row)
+
+    # Load a blank or pretrained spaCy pipeline
+    nlp = spacy.blank("en")  # or spacy.load("en_core_web_sm") if you're using a tokenizer
+
+    # Get input_hash keys
+    input_hashes = list(grouped.keys())
+
+    # Use scikit-learn for stratified splitting (or simple random)
+    train_ids, temp_ids = train_test_split(input_hashes, test_size=0.3, random_state=42)
+    dev_ids, test_ids = train_test_split(temp_ids, test_size=0.5, random_state=42)
+
+    split_ids = {
+        "train": train_ids,
+        "dev": dev_ids,
+        "test": test_ids,
+    }
+
+    # Split input_hash keys so that we don't have any of the same documents
+    # across train/dev/test sets
+    input_hashes = list(grouped.keys())
+    # Use scikit-learn for stratified splitting (or simple random)
+    train_ids, temp_ids = train_test_split(input_hashes, test_size=0.3, random_state=42) # 70% training
+    dev_ids, test_ids = train_test_split(temp_ids, test_size=0.5, random_state=42)
+
+    nlp = spacy.blank("en")
+
+    split_doc_bins = {
+        "train": DocBin(store_user_data=True),
+        "dev": DocBin(store_user_data=True),
+        "test": DocBin(store_user_data=True),
+    }
+
+    #add the data to the empty DocBins
+    for split_name, hash_list in split_ids.items():
+
+        for input_hash in hash_list:
+            examples = grouped[input_hash]
+            text = examples[0].text
+            doc = nlp.make_doc(text)
+
+            span_objs = []
+            for ex in examples:
+                span = doc.char_span(ex.start, ex.end, label=ex.label,
+                                    alignment_mode="contract")
+                if span:
+                    span_objs.append(span)
+                else:
+                    print(f"⚠️ Skipping invalid span in {split_name}: "
+                          "{ex.label} {ex.start}-{ex.end}")
+
+            doc.spans["sc"] = span_objs
+            split_doc_bins[split_name].add(doc)
+
+    print("train/dev/test document counts", len(split_doc_bins['train']),
+          len(split_doc_bins['dev']), len(split_doc_bins['test']))
+
+    # save data to file
+    for split_name, doc_bin in split_doc_bins.items():
+        output_file = Path(directory) / f"{split_name}.spacy"
+        doc_bin.to_disk(output_file)
+        print(f"✅ Saved {split_name} data to {output_file}")
+
+    # generate spacy config:
+    # python -m spacy init config config.cfg --pipeline spancat --lang en --force
+    try:
+        result = subprocess.run(["python", "-m", "spacy", "init", "config",
+                                 f"{directory}/config.cfg", "--pipeline", "spancat",
+                                 "--lang", "en", "--force"],
+                                capture_output=True, text=True)
+        print(result.stdout)
+    except:
+        raise Exception("⚠️ spacy init config failed")
+
+    # set space spancat suggester config to have ngram size up to 30
+    # perl -pe  's/sizes = \[1,2,3\]/sizes = \[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30\]/' -i.bak config.cfg
+    # cat config.cfg | grep sizes
+    try:
+        result = subprocess.run(["perl", "-pe", "s/sizes = \[1,2,3\]/sizes = \[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30\]/",
+                                 "-i.bak", f"{directory}/config.cfg"],
+                                capture_output=True, text=True)
+        #print(result.stdout)
+        # cat config.cfg | grep sizes
+        result = subprocess.run(["cat", f"{directory}/config.cfg", "|", "grep", "sizes"],
+                                capture_output=True, text=True)
+        #print(result.stdout)
+        if "30" not in result.stdout:
+            raise Exception("⚠️ ngram size not set to 30")
+    except:
+        raise Exception("⚠️ spacy init config failed")
+
+    # in case of trouble try this
+    # python -m spacy debug data config.cfg  --paths.train ./train.spacy  --paths.dev ./dev.spacy --paths.test ./test.spacy
+    # result = subprocess.run("python -m spacy debug data config.cfg  --paths.train ./train.spacy  --paths.dev ./dev.spacy --paths.test ./test.spacy",
+    #                         shell=True, capture_output=True, text=True)
+    # print("debug config results")
+    # print(result.stdout)
+
+    # train
+    #train_cmd = "python -m spacy train config.cfg --output ./output --paths.train ./train.spacy --paths.dev ./dev.spacy --gpu-id 0"
+    # training was hard to get working with subprocess
+    # https://github.com/explosion/spaCy/discussions/11673
+    start = time.time()
+    train(f"{directory}/config.cfg", use_gpu=0, output_path=f"{directory}/output",
+          overrides={"paths.train": f"{directory}/train.spacy", "paths.dev": f"{directory}/dev.spacy"})
+    end = time.time()
+    print(f"Training took {end - start:.2f} seconds.")
+
+    # evaluate
+    result = evaluate(
+        f"{directory}/output/model-best",
+        f"{directory}/test.spacy",
+        f"{directory}/metrics.json",
+        use_gpu=0,
+        spans_key="sc"  # Include this if needed
+    )
+    print("eval results")
+    print(result) # uncomment to see the
+
+    return extract_metrics(f"{directory}/metrics.json")
+
+def experiment_006_only_meenu(rerun=False):
+    """This is an experiment with just the basic spacy word vectors and the
+    organic data split 70/15/15 using spans that were from a single annotator
+
+
+    Note: this function uses half subprocess to run shell commands and half
+    spacy spacy.cli . Subprocess wasn't working (maybe because of tqdm type status
+    messages?)
+    """
+    # make experiment directory
+    directory = inspect.currentframe().f_code.co_name
+    try:
+        os.makedirs(directory, exist_ok=False)
+    except FileExistsError:
+        print(f"directory {directory} already exists")
+        if rerun:
+            print("rerunning experiment")
+        else:
+            return
+
+
+    prodigy_review_file = "teaching_reviews/data_jsonl/teaching_reviews_pilot1_spans_reviews_20250422.json"
+    # check that the data file exists
+    if not os.path.exists(prodigy_review_file):
+        raise Exception(f"data file {prodigy_review_file} not found")
+
+
+    #extract data
+    prodigy_df = tr.file_to_span_df(prodigy_review_file)
+    prodigy_df = prodigy_df[prodigy_df["annotator"] == "pilot1_review-meenu"]
+
+    # Group by input_hash to collect spans for the same document
+    # this way there will be no spans from the same document crossing
+    # train/dev/test partitions
+    grouped = defaultdict(list)
+    for row in prodigy_df.itertuples(index=False):
+        grouped[row.input_hash].append(row)
+
+    # Load a blank or pretrained spaCy pipeline
+    nlp = spacy.blank("en")  # or spacy.load("en_core_web_sm") if you're using a tokenizer
+
+    # Get input_hash keys
+    input_hashes = list(grouped.keys())
+
+    # Use scikit-learn for stratified splitting (or simple random)
+    train_ids, temp_ids = train_test_split(input_hashes, test_size=0.3, random_state=42)
+    dev_ids, test_ids = train_test_split(temp_ids, test_size=0.5, random_state=42)
+
+    split_ids = {
+        "train": train_ids,
+        "dev": dev_ids,
+        "test": test_ids,
+    }
+
+    # Split input_hash keys so that we don't have any of the same documents
+    # across train/dev/test sets
+    input_hashes = list(grouped.keys())
+    # Use scikit-learn for stratified splitting (or simple random)
+    train_ids, temp_ids = train_test_split(input_hashes, test_size=0.3, random_state=42) # 70% training
+    dev_ids, test_ids = train_test_split(temp_ids, test_size=0.5, random_state=42)
+
+    nlp = spacy.blank("en")
+
+    split_doc_bins = {
+        "train": DocBin(store_user_data=True),
+        "dev": DocBin(store_user_data=True),
+        "test": DocBin(store_user_data=True),
+    }
+
+    #add the data to the empty DocBins
+    for split_name, hash_list in split_ids.items():
+
+        for input_hash in hash_list:
+            examples = grouped[input_hash]
+            text = examples[0].text
+            doc = nlp.make_doc(text)
+
+            span_objs = []
+            for ex in examples:
+                span = doc.char_span(ex.start, ex.end, label=ex.label,
+                                    alignment_mode="contract")
+                if span:
+                    span_objs.append(span)
+                else:
+                    print(f"⚠️ Skipping invalid span in {split_name}: "
+                          "{ex.label} {ex.start}-{ex.end}")
+
+            doc.spans["sc"] = span_objs
+            split_doc_bins[split_name].add(doc)
+
+    print("train/dev/test document counts", len(split_doc_bins['train']),
+          len(split_doc_bins['dev']), len(split_doc_bins['test']))
+
+    # save data to file
+    for split_name, doc_bin in split_doc_bins.items():
+        output_file = Path(directory) / f"{split_name}.spacy"
+        doc_bin.to_disk(output_file)
+        print(f"✅ Saved {split_name} data to {output_file}")
+
+    # generate spacy config:
+    # python -m spacy init config config.cfg --pipeline spancat --lang en --force
+    try:
+        result = subprocess.run(["python", "-m", "spacy", "init", "config",
+                                 f"{directory}/config.cfg", "--pipeline", "spancat",
+                                 "--lang", "en", "--force"],
+                                capture_output=True, text=True)
+        print(result.stdout)
+    except:
+        raise Exception("⚠️ spacy init config failed")
+
+    # set space spancat suggester config to have ngram size up to 30
+    # perl -pe  's/sizes = \[1,2,3\]/sizes = \[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30\]/' -i.bak config.cfg
+    # cat config.cfg | grep sizes
+    try:
+        result = subprocess.run(["perl", "-pe", "s/sizes = \[1,2,3\]/sizes = \[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30\]/",
+                                 "-i.bak", f"{directory}/config.cfg"],
+                                capture_output=True, text=True)
+        #print(result.stdout)
+        # cat config.cfg | grep sizes
+        result = subprocess.run(["cat", f"{directory}/config.cfg", "|", "grep", "sizes"],
+                                capture_output=True, text=True)
+        #print(result.stdout)
+        if "30" not in result.stdout:
+            raise Exception("⚠️ ngram size not set to 30")
+    except:
+        raise Exception("⚠️ spacy init config failed")
+
+    # in case of trouble try this
+    # python -m spacy debug data config.cfg  --paths.train ./train.spacy  --paths.dev ./dev.spacy --paths.test ./test.spacy
+    # result = subprocess.run("python -m spacy debug data config.cfg  --paths.train ./train.spacy  --paths.dev ./dev.spacy --paths.test ./test.spacy",
+    #                         shell=True, capture_output=True, text=True)
+    # print("debug config results")
+    # print(result.stdout)
+
+    # train
+    #train_cmd = "python -m spacy train config.cfg --output ./output --paths.train ./train.spacy --paths.dev ./dev.spacy --gpu-id 0"
+    # training was hard to get working with subprocess
+    # https://github.com/explosion/spaCy/discussions/11673
+    start = time.time()
+    train(f"{directory}/config.cfg", use_gpu=0, output_path=f"{directory}/output",
+          overrides={"paths.train": f"{directory}/train.spacy", "paths.dev": f"{directory}/dev.spacy"})
+    end = time.time()
+    print(f"Training took {end - start:.2f} seconds.")
+
+    # evaluate
+    result = evaluate(
+        f"{directory}/output/model-best",
+        f"{directory}/test.spacy",
+        f"{directory}/metrics.json",
+        use_gpu=0,
+        spans_key="sc"  # Include this if needed
+    )
+    print("eval results")
+    print(result) # uncomment to see the
+
+    return extract_metrics(f"{directory}/metrics.json")
+
+def experiment_007_only_henry(rerun=False):
+    """This is an experiment with just the basic spacy word vectors and the
+    organic data split 70/15/15 using spans that were from a single annotator
+
+
+    Note: this function uses half subprocess to run shell commands and half
+    spacy spacy.cli . Subprocess wasn't working (maybe because of tqdm type status
+    messages?)
+    """
+    # make experiment directory
+    directory = inspect.currentframe().f_code.co_name
+    try:
+        os.makedirs(directory, exist_ok=False)
+    except FileExistsError:
+        print(f"directory {directory} already exists")
+        if rerun:
+            print("rerunning experiment")
+        else:
+            return
+
+
+    prodigy_review_file = "teaching_reviews/data_jsonl/teaching_reviews_pilot1_spans_reviews_20250422.json"
+    # check that the data file exists
+    if not os.path.exists(prodigy_review_file):
+        raise Exception(f"data file {prodigy_review_file} not found")
+
+
+    #extract data
+    prodigy_df = tr.file_to_span_df(prodigy_review_file)
+    prodigy_df = prodigy_df[prodigy_df["annotator"] == "pilot1_review-Henry%20%20(replace%20%3Cyour%20name%3E%20with%20your%20first%20name"]
+
+    # Group by input_hash to collect spans for the same document
+    # this way there will be no spans from the same document crossing
+    # train/dev/test partitions
+    grouped = defaultdict(list)
+    for row in prodigy_df.itertuples(index=False):
+        grouped[row.input_hash].append(row)
+
+    # Load a blank or pretrained spaCy pipeline
+    nlp = spacy.blank("en")  # or spacy.load("en_core_web_sm") if you're using a tokenizer
+
+    # Get input_hash keys
+    input_hashes = list(grouped.keys())
+
+    # Use scikit-learn for stratified splitting (or simple random)
+    train_ids, temp_ids = train_test_split(input_hashes, test_size=0.3, random_state=42)
+    dev_ids, test_ids = train_test_split(temp_ids, test_size=0.5, random_state=42)
+
+    split_ids = {
+        "train": train_ids,
+        "dev": dev_ids,
+        "test": test_ids,
+    }
+
+    # Split input_hash keys so that we don't have any of the same documents
+    # across train/dev/test sets
+    input_hashes = list(grouped.keys())
+    # Use scikit-learn for stratified splitting (or simple random)
+    train_ids, temp_ids = train_test_split(input_hashes, test_size=0.3, random_state=42) # 70% training
+    dev_ids, test_ids = train_test_split(temp_ids, test_size=0.5, random_state=42)
+
+    nlp = spacy.blank("en")
+
+    split_doc_bins = {
+        "train": DocBin(store_user_data=True),
+        "dev": DocBin(store_user_data=True),
+        "test": DocBin(store_user_data=True),
+    }
+
+    #add the data to the empty DocBins
+    for split_name, hash_list in split_ids.items():
+
+        for input_hash in hash_list:
+            examples = grouped[input_hash]
+            text = examples[0].text
+            doc = nlp.make_doc(text)
+
+            span_objs = []
+            for ex in examples:
+                span = doc.char_span(ex.start, ex.end, label=ex.label,
+                                    alignment_mode="contract")
+                if span:
+                    span_objs.append(span)
+                else:
+                    print(f"⚠️ Skipping invalid span in {split_name}: "
+                          "{ex.label} {ex.start}-{ex.end}")
+
+            doc.spans["sc"] = span_objs
+            split_doc_bins[split_name].add(doc)
+
+    print("train/dev/test document counts", len(split_doc_bins['train']),
+          len(split_doc_bins['dev']), len(split_doc_bins['test']))
+
+    # save data to file
+    for split_name, doc_bin in split_doc_bins.items():
+        output_file = Path(directory) / f"{split_name}.spacy"
+        doc_bin.to_disk(output_file)
+        print(f"✅ Saved {split_name} data to {output_file}")
+
+    # generate spacy config:
+    # python -m spacy init config config.cfg --pipeline spancat --lang en --force
+    try:
+        result = subprocess.run(["python", "-m", "spacy", "init", "config",
+                                 f"{directory}/config.cfg", "--pipeline", "spancat",
+                                 "--lang", "en", "--force"],
+                                capture_output=True, text=True)
+        print(result.stdout)
+    except:
+        raise Exception("⚠️ spacy init config failed")
+
+    # set space spancat suggester config to have ngram size up to 30
+    # perl -pe  's/sizes = \[1,2,3\]/sizes = \[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30\]/' -i.bak config.cfg
+    # cat config.cfg | grep sizes
+    try:
+        result = subprocess.run(["perl", "-pe", "s/sizes = \[1,2,3\]/sizes = \[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30\]/",
+                                 "-i.bak", f"{directory}/config.cfg"],
+                                capture_output=True, text=True)
+        #print(result.stdout)
+        # cat config.cfg | grep sizes
+        result = subprocess.run(["cat", f"{directory}/config.cfg", "|", "grep", "sizes"],
+                                capture_output=True, text=True)
+        #print(result.stdout)
+        if "30" not in result.stdout:
+            raise Exception("⚠️ ngram size not set to 30")
+    except:
+        raise Exception("⚠️ spacy init config failed")
+
+    # in case of trouble try this
+    # python -m spacy debug data config.cfg  --paths.train ./train.spacy  --paths.dev ./dev.spacy --paths.test ./test.spacy
+    # result = subprocess.run("python -m spacy debug data config.cfg  --paths.train ./train.spacy  --paths.dev ./dev.spacy --paths.test ./test.spacy",
+    #                         shell=True, capture_output=True, text=True)
+    # print("debug config results")
+    # print(result.stdout)
+
+    # train
+    #train_cmd = "python -m spacy train config.cfg --output ./output --paths.train ./train.spacy --paths.dev ./dev.spacy --gpu-id 0"
+    # training was hard to get working with subprocess
+    # https://github.com/explosion/spaCy/discussions/11673
+    start = time.time()
+    train(f"{directory}/config.cfg", use_gpu=0, output_path=f"{directory}/output",
+          overrides={"paths.train": f"{directory}/train.spacy", "paths.dev": f"{directory}/dev.spacy"})
+    end = time.time()
+    print(f"Training took {end - start:.2f} seconds.")
+
+    # evaluate
+    result = evaluate(
+        f"{directory}/output/model-best",
+        f"{directory}/test.spacy",
+        f"{directory}/metrics.json",
+        #displacy_path=directory, this currently doesn't work
+        use_gpu=0,
+        spans_key="sc"  # Include this if needed
+    )
+    print("eval results")
+    print(result) # uncomment to see the
+
+    return extract_metrics(f"{directory}/metrics.json")
+
+
+def experiment_008_only_manojkumar(rerun=False):
+    """This is an experiment with just the basic spacy word vectors and the
+    organic data split 70/15/15 using spans that were from a single annotator
+
+
+    Note: this function uses half subprocess to run shell commands and half
+    spacy spacy.cli . Subprocess wasn't working (maybe because of tqdm type status
+    messages?)
+    """
+    # make experiment directory
+    directory = inspect.currentframe().f_code.co_name
+    try:
+        os.makedirs(directory, exist_ok=False)
+    except FileExistsError:
+        print(f"directory {directory} already exists")
+        if rerun:
+            print("rerunning experiment")
+        else:
+            return
+
+
+    prodigy_review_file = "teaching_reviews/data_jsonl/teaching_reviews_pilot1_spans_reviews_20250422.json"
+    # check that the data file exists
+    if not os.path.exists(prodigy_review_file):
+        raise Exception(f"data file {prodigy_review_file} not found")
+
+
+    #extract data
+    prodigy_df = tr.file_to_span_df(prodigy_review_file)
+    prodigy_df = prodigy_df[prodigy_df["annotator"] == "pilot1_review-manojkumar"]
+
+    # Group by input_hash to collect spans for the same document
+    # this way there will be no spans from the same document crossing
+    # train/dev/test partitions
+    grouped = defaultdict(list)
+    for row in prodigy_df.itertuples(index=False):
+        grouped[row.input_hash].append(row)
+
+    # Load a blank or pretrained spaCy pipeline
+    nlp = spacy.blank("en")  # or spacy.load("en_core_web_sm") if you're using a tokenizer
+
+    # Get input_hash keys
+    input_hashes = list(grouped.keys())
+
+    # Use scikit-learn for stratified splitting (or simple random)
+    train_ids, temp_ids = train_test_split(input_hashes, test_size=0.3, random_state=42)
+    dev_ids, test_ids = train_test_split(temp_ids, test_size=0.5, random_state=42)
+
+    split_ids = {
+        "train": train_ids,
+        "dev": dev_ids,
+        "test": test_ids,
+    }
+
+    # Split input_hash keys so that we don't have any of the same documents
+    # across train/dev/test sets
+    input_hashes = list(grouped.keys())
+    # Use scikit-learn for stratified splitting (or simple random)
+    train_ids, temp_ids = train_test_split(input_hashes, test_size=0.3, random_state=42) # 70% training
+    dev_ids, test_ids = train_test_split(temp_ids, test_size=0.5, random_state=42)
+
+    nlp = spacy.blank("en")
+
+    split_doc_bins = {
+        "train": DocBin(store_user_data=True),
+        "dev": DocBin(store_user_data=True),
+        "test": DocBin(store_user_data=True),
+    }
+
+    #add the data to the empty DocBins
+    for split_name, hash_list in split_ids.items():
+
+        for input_hash in hash_list:
+            examples = grouped[input_hash]
+            text = examples[0].text
+            doc = nlp.make_doc(text)
+
+            span_objs = []
+            for ex in examples:
+                span = doc.char_span(ex.start, ex.end, label=ex.label,
+                                    alignment_mode="contract")
+                if span:
+                    span_objs.append(span)
+                else:
+                    print(f"⚠️ Skipping invalid span in {split_name}: "
+                          "{ex.label} {ex.start}-{ex.end}")
+
+            doc.spans["sc"] = span_objs
+            split_doc_bins[split_name].add(doc)
+
+    print("train/dev/test document counts", len(split_doc_bins['train']),
+          len(split_doc_bins['dev']), len(split_doc_bins['test']))
+
+    # save data to file
+    for split_name, doc_bin in split_doc_bins.items():
+        output_file = Path(directory) / f"{split_name}.spacy"
+        doc_bin.to_disk(output_file)
+        print(f"✅ Saved {split_name} data to {output_file}")
+
+    # generate spacy config:
+    # python -m spacy init config config.cfg --pipeline spancat --lang en --force
+    try:
+        result = subprocess.run(["python", "-m", "spacy", "init", "config",
+                                 f"{directory}/config.cfg", "--pipeline", "spancat",
+                                 "--lang", "en", "--force"],
+                                capture_output=True, text=True)
+        print(result.stdout)
+    except:
+        raise Exception("⚠️ spacy init config failed")
+
+    # set space spancat suggester config to have ngram size up to 30
+    # perl -pe  's/sizes = \[1,2,3\]/sizes = \[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30\]/' -i.bak config.cfg
+    # cat config.cfg | grep sizes
+    try:
+        result = subprocess.run(["perl", "-pe", "s/sizes = \[1,2,3\]/sizes = \[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30\]/",
+                                 "-i.bak", f"{directory}/config.cfg"],
+                                capture_output=True, text=True)
+        #print(result.stdout)
+        # cat config.cfg | grep sizes
+        result = subprocess.run(["cat", f"{directory}/config.cfg", "|", "grep", "sizes"],
+                                capture_output=True, text=True)
+        #print(result.stdout)
+        if "30" not in result.stdout:
+            raise Exception("⚠️ ngram size not set to 30")
+    except:
+        raise Exception("⚠️ spacy init config failed")
+
+    # in case of trouble try this
+    # python -m spacy debug data config.cfg  --paths.train ./train.spacy  --paths.dev ./dev.spacy --paths.test ./test.spacy
+    # result = subprocess.run("python -m spacy debug data config.cfg  --paths.train ./train.spacy  --paths.dev ./dev.spacy --paths.test ./test.spacy",
+    #                         shell=True, capture_output=True, text=True)
+    # print("debug config results")
+    # print(result.stdout)
+
+    # train
+    #train_cmd = "python -m spacy train config.cfg --output ./output --paths.train ./train.spacy --paths.dev ./dev.spacy --gpu-id 0"
+    # training was hard to get working with subprocess
+    # https://github.com/explosion/spaCy/discussions/11673
+    start = time.time()
+    train(f"{directory}/config.cfg", use_gpu=0, output_path=f"{directory}/output",
+          overrides={"paths.train": f"{directory}/train.spacy", "paths.dev": f"{directory}/dev.spacy"})
+    end = time.time()
+    print(f"Training took {end - start:.2f} seconds.")
+
+    # evaluate
+    result = evaluate(
+        f"{directory}/output/model-best",
+        f"{directory}/test.spacy",
+        f"{directory}/metrics.json",
+        #displacy_path=directory, this currently doesn't work
+        use_gpu=0,
+        spans_key="sc"  # Include this if needed
+    )
+    print("eval results")
+    print(result) # uncomment to see the
+
+    return extract_metrics(f"{directory}/metrics.json")
+
+def experiment_009_only_rohith(rerun=False):
+    """This is an experiment with just the basic spacy word vectors and the
+    organic data split 70/15/15 using spans that were from a single annotator
+
+
+    Note: this function uses half subprocess to run shell commands and half
+    spacy spacy.cli . Subprocess wasn't working (maybe because of tqdm type status
+    messages?)
+    """
+    # make experiment directory
+    directory = inspect.currentframe().f_code.co_name
+    try:
+        os.makedirs(directory, exist_ok=False)
+    except FileExistsError:
+        print(f"directory {directory} already exists")
+        if rerun:
+            print("rerunning experiment")
+        else:
+            return
+
+
+    prodigy_review_file = "teaching_reviews/data_jsonl/teaching_reviews_pilot1_spans_reviews_20250422.json"
+    # check that the data file exists
+    if not os.path.exists(prodigy_review_file):
+        raise Exception(f"data file {prodigy_review_file} not found")
+
+
+    #extract data
+    prodigy_df = tr.file_to_span_df(prodigy_review_file)
+    prodigy_df = prodigy_df[prodigy_df["annotator"] == "pilot1_review-rohith"]
+
+    # Group by input_hash to collect spans for the same document
+    # this way there will be no spans from the same document crossing
+    # train/dev/test partitions
+    grouped = defaultdict(list)
+    for row in prodigy_df.itertuples(index=False):
+        grouped[row.input_hash].append(row)
+
+    # Load a blank or pretrained spaCy pipeline
+    nlp = spacy.blank("en")  # or spacy.load("en_core_web_sm") if you're using a tokenizer
+
+    # Get input_hash keys
+    input_hashes = list(grouped.keys())
+
+    # Use scikit-learn for stratified splitting (or simple random)
+    train_ids, temp_ids = train_test_split(input_hashes, test_size=0.3, random_state=42)
+    dev_ids, test_ids = train_test_split(temp_ids, test_size=0.5, random_state=42)
+
+    split_ids = {
+        "train": train_ids,
+        "dev": dev_ids,
+        "test": test_ids,
+    }
+
+    # Split input_hash keys so that we don't have any of the same documents
+    # across train/dev/test sets
+    input_hashes = list(grouped.keys())
+    # Use scikit-learn for stratified splitting (or simple random)
+    train_ids, temp_ids = train_test_split(input_hashes, test_size=0.3, random_state=42) # 70% training
+    dev_ids, test_ids = train_test_split(temp_ids, test_size=0.5, random_state=42)
+
+    nlp = spacy.blank("en")
+
+    split_doc_bins = {
+        "train": DocBin(store_user_data=True),
+        "dev": DocBin(store_user_data=True),
+        "test": DocBin(store_user_data=True),
+    }
+
+    #add the data to the empty DocBins
+    for split_name, hash_list in split_ids.items():
+
+        for input_hash in hash_list:
+            examples = grouped[input_hash]
+            text = examples[0].text
+            doc = nlp.make_doc(text)
+
+            span_objs = []
+            for ex in examples:
+                span = doc.char_span(ex.start, ex.end, label=ex.label,
+                                    alignment_mode="contract")
+                if span:
+                    span_objs.append(span)
+                else:
+                    print(f"⚠️ Skipping invalid span in {split_name}: "
+                          "{ex.label} {ex.start}-{ex.end}")
+
+            doc.spans["sc"] = span_objs
+            split_doc_bins[split_name].add(doc)
+
+    print("train/dev/test document counts", len(split_doc_bins['train']),
+          len(split_doc_bins['dev']), len(split_doc_bins['test']))
+
+    # save data to file
+    for split_name, doc_bin in split_doc_bins.items():
+        output_file = Path(directory) / f"{split_name}.spacy"
+        doc_bin.to_disk(output_file)
+        print(f"✅ Saved {split_name} data to {output_file}")
+
+    # generate spacy config:
+    # python -m spacy init config config.cfg --pipeline spancat --lang en --force
+    try:
+        result = subprocess.run(["python", "-m", "spacy", "init", "config",
+                                 f"{directory}/config.cfg", "--pipeline", "spancat",
+                                 "--lang", "en", "--force"],
+                                capture_output=True, text=True)
+        print(result.stdout)
+    except:
+        raise Exception("⚠️ spacy init config failed")
+
+    # set space spancat suggester config to have ngram size up to 30
+    # perl -pe  's/sizes = \[1,2,3\]/sizes = \[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30\]/' -i.bak config.cfg
+    # cat config.cfg | grep sizes
+    try:
+        result = subprocess.run(["perl", "-pe", "s/sizes = \[1,2,3\]/sizes = \[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30\]/",
+                                 "-i.bak", f"{directory}/config.cfg"],
+                                capture_output=True, text=True)
+        #print(result.stdout)
+        # cat config.cfg | grep sizes
+        result = subprocess.run(["cat", f"{directory}/config.cfg", "|", "grep", "sizes"],
+                                capture_output=True, text=True)
+        #print(result.stdout)
+        if "30" not in result.stdout:
+            raise Exception("⚠️ ngram size not set to 30")
+    except:
+        raise Exception("⚠️ spacy init config failed")
+
+    # in case of trouble try this
+    # python -m spacy debug data config.cfg  --paths.train ./train.spacy  --paths.dev ./dev.spacy --paths.test ./test.spacy
+    # result = subprocess.run("python -m spacy debug data config.cfg  --paths.train ./train.spacy  --paths.dev ./dev.spacy --paths.test ./test.spacy",
+    #                         shell=True, capture_output=True, text=True)
+    # print("debug config results")
+    # print(result.stdout)
+
+    # train
+    #train_cmd = "python -m spacy train config.cfg --output ./output --paths.train ./train.spacy --paths.dev ./dev.spacy --gpu-id 0"
+    # training was hard to get working with subprocess
+    # https://github.com/explosion/spaCy/discussions/11673
+    start = time.time()
+    train(f"{directory}/config.cfg", use_gpu=0, output_path=f"{directory}/output",
+          overrides={"paths.train": f"{directory}/train.spacy", "paths.dev": f"{directory}/dev.spacy"})
+    end = time.time()
+    print(f"Training took {end - start:.2f} seconds.")
+
+    # evaluate
+    result = evaluate(
+        f"{directory}/output/model-best",
+        f"{directory}/test.spacy",
+        f"{directory}/metrics.json",
+        use_gpu=0,
+        spans_key="sc"  # Include this if needed
+    )
+    print("eval results")
+    print(result) # uncomment to see the
+
+    return extract_metrics(f"{directory}/metrics.json")
+
+
 def make_experiment_results_table(experiment_results):
     """ takes the experiemental results and outputs a pandas table with
     columns for each metric and rows for each experiment"""
     output = pd.DataFrame(columns=["experiment", "metric", "precision", "recall", "f1"])
-    for experiment_name in experiment_results:
-        nested_rows = flatten_metrics(experiment_results[experiment_name])
-        for metric, row in nested_rows.items():
-            output.loc[len(output)] = [experiment_name, metric, row["p"], row["r"], row["f"]]
+    for experiment_name, metrics_result in experiment_results.items():
+        # Check if the metrics_result is a dictionary
+        if isinstance(metrics_result, dict):
+            nested_rows = flatten_metrics(metrics_result)
+            for metric, row in nested_rows.items():
+                # Ensure row is a dictionary before accessing keys
+                if isinstance(row, dict):
+                    output.loc[len(output)] = [experiment_name, metric, row.get("p", np.nan), row.get("r", np.nan), row.get("f", np.nan)]
+                else:
+                    print(f"⚠️ Skipping invalid metric data for experiment '{experiment_name}', metric '{metric}'")
+        else:
+            print(f"⚠️ Skipping experiment '{experiment_name}' due to invalid metrics data (expected dict, got {type(metrics_result)})")
+
     return output
 
 def plot_metrics(metrics):
