@@ -50,6 +50,8 @@ def extract_spans_from_review(review_list: List[tuple]) -> List[Type[pd.DataFram
             linenum = eg['meta']["linenum"]
             input_hash = eg["_input_hash"]
             for start, end, label in extract_spans_tuple(eg["spans"]):
+                if label in ("UNSURE","COMPARISON"):
+                    continue
                 spans.append(Span(start, end, label, input_hash, filename,
                              linenum, reviewer, eg["text"][start:end],
                              eg["text"]))
