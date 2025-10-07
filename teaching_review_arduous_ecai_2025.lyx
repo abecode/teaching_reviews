@@ -1,0 +1,1947 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass beamer
+\begin_preamble
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{tabularx}
+
+\usepackage{multicol}
+
+\mode<presentation>
+{
+%\usetheme{AnnArbor} % compulsory argument
+%\usecolortheme{beaver} % optional argument
+%\usetheme{Montpellier}
+\usetheme{Frankfurt}
+\usecolortheme{dolphin}
+}
+
+\usepackage{tikz}
+\usetikzlibrary{snakes,arrows,shapes}
+
+% for reprinting the title slide
+\renewcommand\makebeamertitle{\frame[label=mytitle]{\maketitle}}
+
+% link color
+\definecolor{links}{HTML}{2A1B81} % define color, https://tex.stackexchange.com/questions/13423/how-to-change-the-color-of-href-links-for-real
+\hypersetup{colorlinks,urlcolor=links,linkcolor=} % set color for urls but not internal links
+\end_preamble
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+title[Annotating Teaching Reviews]{Span-Level Domain-Specific Annotated
+ Student Feedback Pilot Dataset}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Author
+Zhengyuan (Jenny) Feng, Mengyuan Cui, Meenu Bala, 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+
+\end_layout
+
+\end_inset
+
+Henry Agaba, and Abe Kazemzadeh
+\end_layout
+
+\begin_layout Institute
+Graduate Programs in Software and Data Science
+\begin_inset Newline newline
+\end_inset
+
+University of St.
+ Thomas 
+\end_layout
+
+\begin_layout Date
+Oct.
+ 26, 2025
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+vspace{1em}
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename ust-logo.jpeg
+	lyxscale 30
+	width 30text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+setbeamercovered{highly dynamic}
+\end_layout
+
+\begin_layout Plain Layout
+
+%
+\backslash
+setbeamercovered{transparent}
+\end_layout
+
+\begin_layout Plain Layout
+
+%
+\backslash
+beamertemplatetransparentcoveredhigh
+\end_layout
+
+\begin_layout Plain Layout
+
+%
+\backslash
+beamertemplatetransparentcovereddynamicmedium
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+The following causes the table of contents to be shown at the beginning
+ of every subsection.
+ Delete this, if you do not want it.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+AtBeginSection[]{
+\end_layout
+
+\begin_layout Plain Layout
+
+  
+\backslash
+frame<beamer>{ 
+\end_layout
+
+\begin_layout Plain Layout
+
+    
+\backslash
+frametitle{Outline}   
+\end_layout
+
+\begin_layout Plain Layout
+
+    
+\backslash
+tableofcontents[
+\end_layout
+
+\begin_layout Plain Layout
+
+        currentsection,
+\end_layout
+
+\begin_layout Plain Layout
+
+        %currentsubsection,
+\end_layout
+
+\begin_layout Plain Layout
+
+        %hideothersubsections,
+\end_layout
+
+\begin_layout Plain Layout
+
+        %sectionstyle=show/hide,
+\end_layout
+
+\begin_layout Plain Layout
+
+        %subsectionstyle=show/shaded, 
+\end_layout
+
+\begin_layout Plain Layout
+
+   ] 
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+%
+\backslash
+AtBeginSubsection[]{
+\end_layout
+
+\begin_layout Plain Layout
+
+%  
+\backslash
+frame<beamer>{ 
+\end_layout
+
+\begin_layout Plain Layout
+
+%    
+\backslash
+frametitle{Outline}   
+\end_layout
+
+\begin_layout Plain Layout
+
+%    
+\backslash
+tableofcontents[
+\end_layout
+
+\begin_layout Plain Layout
+
+%        currentsection,
+\end_layout
+
+\begin_layout Plain Layout
+
+%        %currentsubsection,
+\end_layout
+
+\begin_layout Plain Layout
+
+%        %hideothersubsections,
+\end_layout
+
+\begin_layout Plain Layout
+
+%        %sectionstyle=show/hide,
+\end_layout
+
+\begin_layout Plain Layout
+
+%        %subsectionstyle=show/shaded, 
+\end_layout
+
+\begin_layout Plain Layout
+
+%   ] 
+\end_layout
+
+\begin_layout Plain Layout
+
+%  }
+\end_layout
+
+\begin_layout Plain Layout
+
+%}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Outline
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 2
+status open
+
+\begin_layout Plain Layout
+
++-
+\end_layout
+
+\end_inset
+
+
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Motivations
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Student feedback is vital for improving teaching and curriculum
+\end_layout
+
+\begin_layout Itemize
+Sentiment analysis does not have the best match 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+In addition to 
+\series bold
+positive
+\series default
+/
+\series bold
+negative
+\series default
+, we would like to match other categories like 
+\series bold
+suggestion
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Inputs may contain a mix of different feedback
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Examine data at the span level
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Create a domain-specific dataset for training natural language processing
+ models
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 2
+status open
+
+\begin_layout Plain Layout
+
++-
+\end_layout
+
+\end_inset
+
+
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Data Source
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+192 feedback entries about one professor at the UST, collected from two
+ sources:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\series bold
+IDEA surveys
+\series default
+, which are official UST end-of-semester evaluations.
+ These contained 169 entries
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+RateMyProfessors
+\series default
+, which provided 23 comments.
+ These were more informal and often more negative
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Section
+Annotation
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 2
+status open
+
+\begin_layout Plain Layout
+
++-
+\end_layout
+
+\end_inset
+
+
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Annotation Categories
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Description
+POSITIVE praise for the instructor or course
+\end_layout
+
+\begin_layout Description
+NEGATIVE criticism or dissatisfaction
+\end_layout
+
+\begin_layout Description
+SUGGESTION constructive feedback or ideas for improvement
+\end_layout
+
+\begin_layout Description
+COMPARISON contrasts between two things, e.g.
+ 
+\begin_inset Quotes eld
+\end_inset
+
+the final was better than the midterm
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Description
+REDACT personal details that must be anonymized
+\end_layout
+
+\begin_layout Description
+UNSURE when the annotator could not confidently assign a label
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\align center
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+vspace{-0.5em}
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename IDEA-vs-RMP-plus-total-v2.png
+	lyxscale 25
+	height 90pheight%
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 1
+status open
+
+\begin_layout Plain Layout
+
+1
+\end_layout
+
+\end_inset
+
+
+\begin_inset Argument 3
+status open
+
+\begin_layout Plain Layout
+label=annotation-approach
+\end_layout
+
+\end_inset
+
+
+\begin_inset Argument 2
+status open
+
+\begin_layout Plain Layout
+
++-
+\end_layout
+
+\end_inset
+
+
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Annotation Approach
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Use Prodigy annotation tool with the span categorization (spancat) setting
+\end_layout
+
+\begin_layout Itemize
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+texttt{prodigy spans.manual pilot1
+\backslash
+_spans blank:en datafile/path.jsonl --label POSITIVE, NEGATIVE,SUGGESTION,COMPARI
+SON,UNSURE,REDACT}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+7 annotators: authors + two additional students
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+One professor and six grad students
+\end_layout
+
+\begin_layout Itemize
+One native speaker and six non-native speakers
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Prior experiments looked at classifying whole inputs (including a MIXED
+ label) and sentence splitting
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 3
+status open
+
+\begin_layout Plain Layout
+label=prodigy-interface
+\end_layout
+
+\end_inset
+
+
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Prodigy Interface
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\align center
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+vspace{-1em	}
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename ProdigyScreenshot.png
+	lyxscale 25
+	height 95theight%
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout AgainFrame
+\begin_inset Argument 1
+status open
+
+\begin_layout Plain Layout
+
+2-
+\end_layout
+
+\end_inset
+
+
+\begin_inset Argument 2
+status open
+
+\begin_layout Plain Layout
+
++-
+\end_layout
+
+\end_inset
+
+annotation-approach
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 2
+status open
+
+\begin_layout Plain Layout
+
++-
+\end_layout
+
+\end_inset
+
+
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Annotation Challenges
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Deciding where a span begins and ends
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Especially when a sentence has multiple labels
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Annotators with different backgrounds
+\end_layout
+
+\begin_layout Itemize
+Overall agreement was marginal, 
+\begin_inset Formula $0.48$
+\end_inset
+
+ measured by Krippendorff's 
+\begin_inset Formula $\alpha$
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Section
+\begin_inset Argument 2
+status open
+
+\begin_layout Plain Layout
+ML Analysis
+\end_layout
+
+\end_inset
+
+Machine Learning Analysis
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 2
+status open
+
+\begin_layout Plain Layout
+
++-
+\end_layout
+
+\end_inset
+
+
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Machine Learning (ML) Models
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Word-level 
+\series bold
+DistilBert
+\series default
+: treated classification as simple token-level prediction
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Each token gets one of the labels
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Chunk-level 
+\series bold
+BERT
+\series default
+: used IOB sequence labeling (similar to typical named entity recognition
+ approach)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Treats chuck classification as token-level classification IOB classification
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+B-LABEL (beginning), I (inside), and O (outside)
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Itemize
+
+\series bold
+SpaCy spancat
+\series default
+: span categorization which supports overlapping spans like POSITIVE plus
+ REDACT
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Two stage classification pipeline
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Suggester: proposes candidate spans within the text
+\end_layout
+
+\begin_layout Itemize
+Classifier: takes suggested spans and classifies them into one or more labels
+\end_layout
+
+\end_deeper
+\end_deeper
+\end_deeper
+\begin_layout AgainFrame
+prodigy-interface
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 2
+status open
+
+\begin_layout Plain Layout
+
++-
+\end_layout
+
+\end_inset
+
+
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+ML Model Results
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+DistilBERT (word/token-level)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+NEGATIVE F1 
+\begin_inset Formula $\approx0.82$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+POSITIVE F1 
+\begin_inset Formula $\approx0.71$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+SUGGESTION F1 
+\begin_inset Formula $\approx0.51$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+REDACT
+\begin_inset Formula $\approx0.99$
+\end_inset
+
+ (trained separately)
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+BERT (IOB chunk level)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Lower scores generally (F1 mostly 
+\begin_inset Formula $<0.4$
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Itemize
+Struggled with limited data and strict span boundaries
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+DistilBERT is faster and performs better than full BERT, but does not group
+ classifications into chunks
+\end_layout
+
+\begin_layout Itemize
+SpaCy (span categorization)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+F1 
+\begin_inset Formula $\approx0.4$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Supports overlapping spans
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+DistilBERT Word/Token-Level Classification Report (w/o REDACT)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{table}[htbp]   
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+centering   
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{minipage}{
+\backslash
+textwidth} 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+centering 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{tabular}{lcccc} 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hline 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+textbf{Label} & 
+\backslash
+textbf{Precision} & 
+\backslash
+textbf{Recall} & 
+\backslash
+textbf{F1-Score} & 
+\backslash
+textbf{Support} 
+\backslash
+
+\backslash
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hline 
+\end_layout
+
+\begin_layout Plain Layout
+
+NEGATIVE   & 0.8305 & 0.8189 & 0.8247 & 359 
+\backslash
+
+\backslash
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+O          & 0.9965 & 0.9911 & 0.9938 & 13778 
+\backslash
+
+\backslash
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+POSITIVE   & 0.6302 & 0.8909 & 0.7382 & 440 
+\backslash
+
+\backslash
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+SUGGESTION & 0.6627 & 0.4133 & 0.5091 & 271 
+\backslash
+
+\backslash
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hline 
+\end_layout
+
+\begin_layout Plain Layout
+
+% leaving out this row to not confuse with the other reports %
+\backslash
+textbf{Accuracy}     &       &        & 0.9734 & 14848 
+\backslash
+
+\backslash
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+textbf{Macro Avg}    & 0.7800 & 0.7786 & 0.7664 & 14848 
+\backslash
+
+\backslash
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+textbf{Weighted Avg} & 0.9755 & 0.9734 & 0.9733 & 14848 
+\backslash
+
+\backslash
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hline 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{tabular} 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+vspace{.5em} 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+caption{Word/token-level DistilBert classification report without REDACT.
+ Here "O" represents outside labeled span, i.e.~neutral.} 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+label{tab:distilbert-wo-redact} 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{minipage}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{table}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+BERT Chunk-Level Classification Report (w/o REDACT)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{table}[htbp]   
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+centering   
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{minipage}{
+\backslash
+textwidth}     
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+centering 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{tabular}{lcccc} 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hline 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+textbf{Label} & 
+\backslash
+textbf{Precision} & 
+\backslash
+textbf{Recall} & 
+\backslash
+textbf{F1-Score} & 
+\backslash
+textbf{Support} 
+\backslash
+
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hline NEGATIVE   & 0.3243 & 0.4800 & 0.3871 & 25 
+\backslash
+
+\backslash
+ POSITIVE   & 0.2361 & 0.5152 & 0.3238 & 33 
+\backslash
+
+\backslash
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+SUGGESTION & 0.1667 & 0.2667 & 0.2051 & 15 
+\backslash
+
+\backslash
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hline 
+\end_layout
+
+\begin_layout Plain Layout
+
+% leaving out this row to not confuse with the other reports %
+\backslash
+textbf{Micro Avg}    & 0.2481 & 0.4521 & 0.3204 & 73 
+\backslash
+
+\backslash
+  
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+textbf{Macro Avg}    & 0.2424 & 0.4206 & 0.3053 & 73 
+\backslash
+
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+textbf{Weighted Avg} & 0.2521 & 0.4521 & 0.3211 & 73 
+\backslash
+
+\backslash
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hline 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{tabular} 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+vspace{.5em} 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+caption{Chunk-level BERT 
+\backslash
+texttt{seqval} (IOB format) classification report without REDACT.
+ } 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+label{tab:bert-IOB} 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{minipage} 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{table}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+SpaCy Span-Level Classification Report
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{table}[htbp]   
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{minipage}{
+\backslash
+textwidth} 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+centering 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{tabular}{lcccc} 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hline 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+textbf{Label} & 
+\backslash
+textbf{Precision} & 
+\backslash
+textbf{Recall} & 
+\backslash
+textbf{F1-Score} & 
+\backslash
+textbf{Support} 
+\backslash
+
+\backslash
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hline NEGATIVE   & 0.5454 & 0.2000 & 0.2927 & 25 
+\backslash
+
+\backslash
+ POSITIVE   & 0.4186 & 0.3673 & 0.3913 & 33 
+\backslash
+
+\backslash
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+SUGGESTION & 0.3076 & 0.2105 & 0.2500 & 15 
+\backslash
+
+\backslash
+ REDACT     & 0.8780 & 0.6000 & 0.7129 & 43 
+\backslash
+
+\backslash
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hline 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+textbf{Macro Avg}    & 0.5374 & 0.3445 & 0.4117 & 116 
+\backslash
+
+\backslash
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+textbf{Weighted Avg} & 0.6018 & 0.3972 & 0.3972 & 116 
+\backslash
+
+\backslash
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hline 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{tabular} 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+vspace{.5em} 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+caption{SpaCy span-level classification report.
+ SpaCy span classification supports overlapping labels so REDACT labels
+ did not have to be classified in a separate step.
+ } 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+label{tab:spacy} 
+\end_layout
+
+\begin_layout Plain Layout
+
+% # macro avg % print((0.5454+0.4186+0.3076+0.8780)/4) % print((0.2000+0.3673+0.2105+0.6
+000)/4) % print((0.2927+0.3913+0.2500+0.7129)/4) % # weighted avg % print((0.5454*25
+ + 0.4186*33 + 0.3076*15 + 0.8780*43)/116) % print((0.2000*25 + 0.3673*33 + 0.2105*15
+ + +0.6000*43)/116) % print((0.2927*25 + 0.3913*33 + 0.2500*15 + 0.7129*43)/116)
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{minipage} 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{table}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Section
+Discussion
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 2
+status open
+
+\begin_layout Plain Layout
+
++-
+\end_layout
+
+\end_inset
+
+
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Challenges and Limitations
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Small pilot dataset: one professor, small number of classes
+\end_layout
+
+\begin_layout Itemize
+Imbalanced labels (e.g., COMPARISON was rare)
+\end_layout
+
+\begin_layout Itemize
+Overlapping spans not fully supported by many models
+\end_layout
+
+\begin_layout Itemize
+Ambiguity in span boundaries
+\end_layout
+
+\begin_layout Itemize
+REDACT label instruction was a confounding factor
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 2
+status open
+
+\begin_layout Plain Layout
+
++-
+\end_layout
+
+\end_inset
+
+
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Future Work
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Expand dataset with more instructors and courses
+\end_layout
+
+\begin_layout Itemize
+Use synthetic data from LLMs
+\end_layout
+
+\begin_layout Itemize
+Explore few-shot/zero-shot models (e.g., LLMs as the classification model)
+\end_layout
+
+\begin_layout Itemize
+Transfer teaching feedback to other domains (e.g.
+ paper reviews)
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 2
+status open
+
+\begin_layout Plain Layout
+
++-
+\end_layout
+
+\end_inset
+
+
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Conclusion
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+We release a new span-level annotated dataset of student feedback
+\end_layout
+
+\begin_layout Itemize
+DistilBERT word/token-level model has the best raw performance metrics
+\end_layout
+
+\begin_layout Itemize
+Span models better match annotation style and desired output (e.g.
+ summarization of teaching reviews)
+\end_layout
+
+\begin_layout Itemize
+Part of a bigger picture of education technology
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Thanks
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Questions
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "https://github.com/abecode/teaching_reviews"
+target "https://github.com/abecode/teaching_reviews"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Frame
+
+\end_layout
+
+\end_body
+\end_document
